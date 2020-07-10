@@ -46,9 +46,7 @@
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </v-card-title>
-        
-            <v-btn color="primary" dark class="ml-5">강좌개설하기</v-btn>
-         
+            <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
           <v-data-table
             :headers="headers"
             :items="desserts"
@@ -170,6 +168,9 @@ import router from '../router'
       }
     },
     methods: {
+      gonewstudy(){
+        router.push({name: 'write'});
+      },
       goCource() {
         router.push({name: 'sWrite'});
       }
