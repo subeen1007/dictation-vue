@@ -44,7 +44,13 @@ export default {
     pw:""
   }),
   methods: {
+    signIn(){
+    //   if(signIn===null)
+    //   return null;
+    // },
+    },
     ...mapActions(['signIn'])
   }
 }
+
 </script>
