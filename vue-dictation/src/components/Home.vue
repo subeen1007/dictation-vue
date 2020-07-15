@@ -46,7 +46,6 @@
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </v-card-title>
-            <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
           <v-data-table
             :headers="headers"
             :items="desserts"
@@ -71,6 +70,7 @@
         hide-details
       ></v-text-field>
     </v-card-title>
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
     <v-data-table
       :headers="headers2"
       :items="lecture2"
@@ -100,7 +100,7 @@ import router from '../router'
         tabs: null,
         searchs:["조건1","조건2","조건3"],
         search: '',
-        courseTabs: ["강좌리스트", "공지사항","학습현황","신청현황","QnA"],
+        courseTabs: ["강좌리스트", "개설강좌"],
         headers: [
           { text: '강좌명', value: 'courseName' },
           { text: '학년', value: 'grade' },
@@ -169,7 +169,7 @@ import router from '../router'
     },
     methods: {
       gonewstudy(){
-        router.push({name: 'write'});
+        router.push({name: 'stwr'});
       },
       goCource() {
         router.push({name: 'sWrite'});

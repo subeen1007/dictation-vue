@@ -46,6 +46,10 @@ const routes = [
     path: '/s_write',
     name: 'sWrite',
     component: () => import('../components/Student.vue')
+  },{
+    path: '/StudyWrite',
+    name: 'stwr',
+    component: () => import('../components/StudyWrite.vue')
   }
 
 
