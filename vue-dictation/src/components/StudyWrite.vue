@@ -115,7 +115,7 @@ import router from '../router'
       
           this.$http.post('/api/lecture', this.lecture).then(res =>{
               console.log(res);
-              router.push({name: 'stwr'});
+              router.push({name: 'Home'});
           }).catch(err=>{
               console.error(err);
           })

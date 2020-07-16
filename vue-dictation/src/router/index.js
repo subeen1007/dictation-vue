@@ -50,6 +50,10 @@ const routes = [
     path: '/StudyWrite',
     name: 'stwr',
     component: () => import('../components/StudyWrite.vue')
+  },{
+    path: '/Teachermain',
+    name: 'tmain',
+    component: () => import('../components/Teachermain.vue')
   }
 
 

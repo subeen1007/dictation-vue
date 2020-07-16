@@ -46,14 +46,14 @@
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </v-card-title>
+          <!-- 강좌 리스트-->
           <v-data-table 
             :headers="headers"
             :items="lectures"
             :search="search"
           >
-        <template v-slot:item.actions="{ item }">
-          <v-btn class="mr-5" small color="primary" @click="{item}" >학습자료보기</v-btn>
-          <v-btn small color="primary" @click="goCource()">시작하기</v-btn>
+        <template v-slot:item.actions="{}">
+          <v-btn class="mr-5" small color="primary" @click="gotmain()" >학습자료보기</v-btn>
         </template>
         </v-data-table>
         </v-card>
@@ -71,17 +71,26 @@
       ></v-text-field>
     </v-card-title>
     <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
+    <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
-      :items="lecture2"
+      :items="mylectures"
       :search="search2"
-    ></v-data-table>
+    >
+    <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
+        <tr>
+          <td>{{row.item.lecture_no}}</td>
+          <td>{{row.item.lecture_nm}}</td>
+          <td>{{row.item.grade}}</td>
+          <td>{{row.item.teacher_nm}}</td>
+          <td>{{row.item.enroll_ed_dt}}</td>
+          <td>
+            <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">강좌로 들어가기</v-btn>
+          </td>
+        </tr>
+    </template>
+    </v-data-table>
     </v-card>
-    </v-tab-item>
-     <v-tab-item>
-     <v-card class="mx-auto">
-      <v-spacer></v-spacer>
-     </v-card>
     </v-tab-item>
     </v-tabs-items>
   </v-card>
@@ -92,18 +101,21 @@ import router from '../router'
   export default {
     
     data () {
-      this.$http.get('/api/lecture/list').then(res =>{
-          //console.log('status code: ${res.ban}');
-          this.lectures=res.data;
-          //console.log(this.lectures);
-          //console.log(this.lecture[1].lecture_no);
-      })
       return {
         tabs: null,
-        searchs:["조건1","조건2","조건3"],
+        searchs:["제목","선생님","학년"],
         search: '',
         courseTabs: ["강좌리스트", "개설강좌"],
         headers: [
+          { text: '강좌코드', value: 'lecture_no' },
+          { text: '강좌명', value: 'lecture_nm' },
+          { text: '학년', value: 'grade' },
+          { text: '선생님', value: 'teacher_nm' },
+          { text: '신청기간', value: 'enroll_ed_dt' },
+          { text: '강좌선택', value: 'actions', sortable: false },
+        ],
+        headers2: [
+          { text: '강좌코드', value: 'lecture_no' },
           { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
           { text: '선생님', value: 'teacher_nm' },
@@ -113,59 +125,39 @@ import router from '../router'
         lectures:[
 
         ],
-        desserts: [
-          {
-            courseName: '1반 받아쓰기',
-            grade: 1,
-            teacher: "홍길동",
-            courseDate: "5.16 - 6.26",
-        
-          },
-          {
-            courseName: '2반 받아쓰기',
-            grade: 1,
-            teacher: "사오정",
-            courseDate: "5.16 - 6.26",
-      
-          },
-          {
-            courseName: '3반 받아쓰기',
-            grade: 1,
-            teacher: "삼장",
-            courseDate: "5.16 - 6.26",
-      
-          },
+        mylectures:[
+
         ],
-        headers2: [
-          {
-            text: '강좌명',
-            align: 'start',
-            sortable: false,
-            value: 'lecture_nm',
-          },
-          { text: '학년', value: 'grade' },
-          { text: '반', value: 'ban' },
-          { text: '선생님', value: 'kor_nm' },
-          { text: '신청기간', value: 'lecture_level' },
-          { text: '강좌선택', value: 'lecture_level' },
-        ],
-        lecture2: [
-        {
-            lecture_nm:'2',
-            grade: 1,
-            ban: 5,
-            kor_nm: '강대성',
-            lecture_level: '70점',
-        },   
-        ],
+
       }
     },
+    created(){
+    this.$http.get('/api/lecture/list').then(res =>{
+          console.log('status code: ${res.ban}');
+          this.lectures=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+    })
+    this.$http.get('/api/lecture/teach_mylec').then(res =>{
+          //console.log('status code: ${res.ban}');
+          this.mylectures=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+    })
+  },
     methods: {
       gonewstudy(){
         router.push({name: 'stwr'});
       },
-      goCource() {
-        router.push({name: 'sWrite'});
+      gotmain(item){
+        this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
+          //console.log('status code: ${res.ban}');
+          //this.mylectures=res.data;
+          console.log(res);
+          //alert(JSON.stringify(this.lectures));
+        })
+        console.log(item.lecture_no);
+        router.push({name: 'tmain'});
       }
     }
   }
