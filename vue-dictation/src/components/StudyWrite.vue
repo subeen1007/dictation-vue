@@ -42,7 +42,7 @@
           <input v-model="lecture.ban" id="BAN" placeholder="반">
           </div>
           <div>
-          <input v-model="lecture.teacher_id" id="TEACHER_ID" placeholder="강좌등록 선생님 이름">
+          <input v-model="lecture.teacher_nm" id="TEACHER_NM" placeholder="강좌등록 선생님 이름">
           </div>
           <div>
           <input v-model="lecture.max_cnt" id="MAX_CNT" placeholder="수강 최대 인원">
@@ -80,8 +80,9 @@
 import router from '../router'
 
   export default {
+    
     data: () =>({
-      
+            
       courseTabs: ["강좌등록", "받아쓰기 등록"],
       tabs: null,
       text:"",

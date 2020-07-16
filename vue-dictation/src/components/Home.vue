@@ -46,9 +46,9 @@
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </v-card-title>
-          <v-data-table
+          <v-data-table 
             :headers="headers"
-            :items="desserts"
+            :items="lectures"
             :search="search"
           >
         <template v-slot:item.actions="{ item }">
@@ -81,11 +81,6 @@
      <v-tab-item>
      <v-card class="mx-auto">
       <v-spacer></v-spacer>
-       <v-data-table
-        :headers="headers3"
-        :items="lecture3"
-        :search="search3"
-       ></v-data-table>
      </v-card>
     </v-tab-item>
     </v-tabs-items>
@@ -95,18 +90,28 @@
 <script>
 import router from '../router'
   export default {
+    
     data () {
+      this.$http.get('/api/lecture/list').then(res =>{
+          //console.log('status code: ${res.ban}');
+          this.lectures=res.data;
+          //console.log(this.lectures);
+          //console.log(this.lecture[1].lecture_no);
+      })
       return {
         tabs: null,
         searchs:["조건1","조건2","조건3"],
         search: '',
         courseTabs: ["강좌리스트", "개설강좌"],
         headers: [
-          { text: '강좌명', value: 'courseName' },
+          { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teacher' },
-          { text: '신청기간', value: 'courseDate' },
+          { text: '선생님', value: 'teacher_nm' },
+          { text: '신청기간', value: 'enroll_ed_dt' },
           { text: '강좌선택', value: 'actions', sortable: false },
+        ],
+        lectures:[
+
         ],
         desserts: [
           {
@@ -132,19 +137,6 @@ import router from '../router'
           },
         ],
         headers2: [
-          {text:'No', value:'board_cd'},
-          {
-            text: '제목',
-            align: 'start',
-            sortable: false,
-            value: 'board_nm',
-          },
-          { text: '파일', value: 'file' },
-          { text: '작성자', value: 'input_id' },
-          { text: '작성일', value: 'input_dt' },
-          { text: '조회수', value: 'views' },
-        ],
-        headers3: [
           {
             text: '강좌명',
             align: 'start',
@@ -153,12 +145,13 @@ import router from '../router'
           },
           { text: '학년', value: 'grade' },
           { text: '반', value: 'ban' },
-          { text: '학생이름', value: 'kor_nm' },
-          { text: '점수', value: 'lecture_level' },
+          { text: '선생님', value: 'kor_nm' },
+          { text: '신청기간', value: 'lecture_level' },
+          { text: '강좌선택', value: 'lecture_level' },
         ],
-        lecture3: [
+        lecture2: [
         {
-            lecture_nm: '2반 받아쓰기',
+            lecture_nm:'2',
             grade: 1,
             ban: 5,
             kor_nm: '강대성',
