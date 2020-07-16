@@ -52,8 +52,8 @@
             :items="lectures"
             :search="search"
           >
-        <template v-slot:item.actions="{}">
-          <v-btn class="mr-5" small color="primary" @click="gotmain()" >학습자료보기</v-btn>
+        <template v-slot:item.actions="{ item }">
+          <v-btn class="mr-5" small color="primary" @click="{item}" >학습자료보기</v-btn>
         </template>
         </v-data-table>
         </v-card>
@@ -77,8 +77,8 @@
       :items="lectures"
       :search="search2"
     >
-    <template v-slot:item.actions="{ }"><!--이렇게 해야td안에 들어감-->
-          <v-btn small color="primary" dark class="ml-5" @click="gotmain()">강좌로 들어가기</v-btn>
+    <template v-slot:item.actions="{ }"><!--이렇게 해야td안에 들어감 -->
+          <v-btn small color="primary" dark class="ml-5" @click="gotmain()">강좌개설하기</v-btn>
     </template>
     </v-data-table>
     </v-card>
@@ -96,7 +96,7 @@ import router from '../router'
         tabs: null,
         searchs:["제목","선생님","학년"],
         search: '',
-        courseTabs: ["강좌리스트", "개설강좌"],
+        courseTabs: ["회원관리", "년도/학기", "공통코드"],
         headers: [
           { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
