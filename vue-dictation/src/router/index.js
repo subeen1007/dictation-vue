@@ -54,6 +54,10 @@ const routes = [
     path: '/Teachermain',
     name: 'tmain',
     component: () => import('../components/Teachermain.vue')
+  },{
+    path: '/Admin',
+    name: 'admin',
+    component: () => import('../components/Admin.vue')
   }
 
 

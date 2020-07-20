@@ -24,7 +24,7 @@ const actions = {
         commit("signInSuccess");
         if(res.data.position_cd === '003003') {
           commit("setSorT","학생");
-          router.push({name: 'readlc'});
+          router.push({name: 'viewlc'});
         }else {
           commit("setSorT","선생님");
           router.push({name: 'Home'});
@@ -36,6 +36,7 @@ const actions = {
     commit("logout");
     router.push({name:'SignIn'});
   }
+
 
 }
 export default actions;
