@@ -1,75 +1,39 @@
 <template>
   <v-card class="mx-auto">
     <v-toolbar
-      color="purple"
+      color="primary lighten-1"
       dark
       flat
     >
-    
-
+    <!--밑에 강좌이름도 받아오는걸로 바꾸기 -->
+    <v-toolbar-title>강좌 이름</v-toolbar-title>
       <template v-slot:extension>
         <v-tabs
           v-model="tabs"
           centered
         >
           <v-tab
-            v-for="courseTab in courseTabs"
-            :key="courseTab"
+            v-for="lectureTitle in lectureTitles"
+            :key="lectureTitle"
           >
-            {{courseTab}}
+          {{ lectureTitle }}
           </v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
- 
-          
-       
+
     <v-tabs-items v-model="tabs">
-      
       <v-tab-item>
-        <v-card>
-          <v-card-title>
-             <v-select
-              class="float-left mt-6"
-              v-model="searchs"
-              :items="searchs"
-              label="검색조건"
-            ></v-select>
-            <v-spacer></v-spacer>
-            <v-text-field
-              v-model="search"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
-            <v-btn icon color="indigo" class="pt-4">
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-          </v-card-title>
-          <!-- 강좌 리스트-->
-          <v-data-table 
-            :headers="headers"
-            :items="lectures"
-            :search="search"
-          >
-        <template v-slot:item="row">
-          <tr>
-            <td>{{row.item.lecture_no}}</td>
-            <td>{{row.item.lecture_nm}}</td>
-            <td>{{row.item.grade}}</td>
-            <td>{{row.item.teacher_nm}}</td>
-            <td>{{row.item.enroll_ed_dt}}</td>
-            <td>
-              <v-btn v-if="row.item.approval_cd === '승인'" class="mr-5" small color="primary" @click="sumbit(item.id)">신청취소</v-btn>
-              <v-btn v-else small color="primary" @click="cancle(item.id)">신청하기</v-btn>
-              <!-- <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">신청하기</v-btn> -->
-            </td>
-        </tr>
-        </template>
-        </v-data-table>
-        </v-card>
+     <v-card class="mx-auto">
+      <v-spacer></v-spacer>
+    <v-data-table
+      :headers="headers1"
+      :items="lecture1"
+      :search="search1"
+    ></v-data-table>
+  </v-card>
       </v-tab-item>
-     <v-tab-item>
+      <v-tab-item>
           <v-card class="mx-auto">
     <v-card-title>
       <v-spacer></v-spacer>
@@ -81,77 +45,111 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
-    <!-- 개설 강좌-->
     <v-data-table
-      :headers="headers2"
-      :items="mylectures"
-      :search="search2"
-    >
-    <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
-        <tr>
-          <td>{{row.item.lecture_no}}</td>
-          <td>{{row.item.lecture_nm}}</td>
-          <td>{{row.item.grade}}</td>
-          <td>{{row.item.teacher_nm}}</td>
-          <td>{{row.item.enroll_ed_dt}}</td>
-          <td>
-            <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">강좌로 들어가기</v-btn>
-          </td>
-        </tr>
-    </template>
-    </v-data-table>
+      :headers="headers"
+      :items="lecture"
+      :search="search"
+    ></v-data-table>
     </v-card>
     </v-tab-item>
+    <v-tab-item>
+              <v-card flat>
+          <v-card-text>
+            api 사용 여부에따라 추후 구성
+          </v-card-text>
+        </v-card>
+    </v-tab-item>
+    <v-tab-item>
+     <!--받아쓰기 등록화면 --> 
+         <v-container align-center>
+ <v-form class="mt-12 pt-4 pr-4 pl-4">
+   <div v-for="item in answers" :key="item.question_no"> 
+     <span>{{item.question_no + ".   받아쓰기"}}</span>
+     <audio src="../assets/dictation.wav" controls></audio>
+    <v-text-field 
+              label="정답을 적으세요."
+              outlined
+              v-model="item.question"
+              :error="item.error"
+              dense>
+    </v-text-field>
+  </div>
+  
+     <v-flex class="text-center">
+        <v-btn width="270" color="primary" x-large @click="answersubmit()">제출</v-btn>
+    </v-flex>
+    </v-form>
+      <v-dialog v-model="dialog" persistent max-width="290">
+    <v-card>
+          <v-card-title class="headline">당신의 점수는?</v-card-title>
+          <v-card-text>{{this.score}} 점입니다.</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="again()">다시하기</v-btn>
+            <v-btn color="green darken-1" text @click="goLecture()">그만하기</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
+      </v-tab-item>
     </v-tabs-items>
   </v-card>
 </template>
 
 <script>
-import router from '../router'
+  import router from '../router'
   export default {
-    
     data () {
       return {
+        lectureTitles:["신청강좌","공지사항","Q&A","받아쓰기하기"],
         tabs: null,
-        searchs:["제목","선생님","학년"],
-        searchs2:["","선생님","학년"],
-        search: '',
-        courseTabs: ["강좌리스트", "개설강좌"],
-        headers: [
-          { text: '강좌코드', value: 'lecture_no' },
-          { text: '강좌명', value: 'lecture_nm' },
+                search: '',
+          headers1: [
+          {
+            text: '강좌명',
+            align: 'start',
+            sortable: false,
+            value: 'lecture_nm',
+          },
           { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teacher_nm' },
-          { text: '신청기간', value: 'enroll_ed_dt' },
-          { text: '신청여부', value: 'actions', sortable: false },
+          { text: '선생님', value: 'teach_id' },
+          { text: '강좌기간', value: 'enroll_en_dt' },
+          { text: '내 점수', value: 'lecture_level' },
         ],
-        headers2: [
-          { text: '강좌코드', value: 'lecture_no' },
-          { text: '강좌명', value: 'lecture_nm' },
-          { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teacher_nm' },
-          { text: '신청기간', value: 'enroll_ed_dt' },
-          { text: '강좌선택', value: 'actions', sortable: false },
+        lecture1: [
+          {
+            lecture_nm: '2반 받아쓰기',
+            grade: 1,
+            teach_id: '사오정',
+            enroll_en_dt: '5.16-6.26',
+            lecture_level: '70점',
+          },   
         ],
-        lectures:[
-
-        ],
-        mylectures:[
-
-        ],
-
+        dialog: false,
+        score: 0,
+        answers: [
+          {question_no: 1, question: '', lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 2, question: '', lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 3, question: '',lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 4, question: '',  lecture_no: 1, course_no: 1, hint:"",error:false, file: null},
+          {question_no: 5, question: '',lecture_no: 1, course_no: 1, hint:"",error:false, file: null},
+          {question_no: 6, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 7, question: '',lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 8, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 9, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 10, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          ],
       }
     },
+    // 음성파일 들고오기 예시
     created(){
-    this.$http.post('/api/lecture/student_lec_list').then(res =>{
+    this.$http.get('/api/lecture/list').then(res =>{
           console.log('status code: ${res.ban}');
           this.lectures=res.data;
           //console.log(res);
           //alert(JSON.stringify(this.lectures));
-        
     })
-    this.$http.post('/api/lecture/student_mylec').then(res =>{
+    this.$http.get('/api/lecture/teach_mylec').then(res =>{
           //console.log('status code: ${res.ban}');
           this.mylectures=res.data;
           //console.log(res);
@@ -159,30 +157,38 @@ import router from '../router'
     })
   },
     methods: {
-      gonewstudy(){
-        router.push({name: 'stwr'});
-      },
-      gotmain(item){
-        this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
-          console.log(res);
-        })
-        //console.log(item.lecture_no);
-        router.push({name: 'tmain'});
-      },
-      
-      /*approval_yn(item){
-        if(item.approval_cd=="승인"){
-          this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
-          console.log(res);
-          })
-        }else{
-          this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
-          console.log(res);
-          })
+    answersubmit() {
 
+     this.score = 0;
+    let i =0;
+      this.$http.post('api/enroll/answer', this.answers).then(res => {
+        for(let answer of res.data) {
+          
+          if(answer) {
+            this.score += 10;
+          }else {
+            this.answers[i].error = true;
+          }
+          i++;
         }
-
-      }*/
+        this.dialog = true;
+      }).catch( err => {
+        console.log(err);
+      })
+    
+     
+    
+    },
+    again() {
+      for(let i in this.answers) {
+        this.answers[i].error = false;
+        this.answers[i].question = "";
+      }
+      this.dialog = false
+    },
+    goLecture() {
+      router.push({path: '/readlc'})
     }
   }
+}
 </script>
