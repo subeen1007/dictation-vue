@@ -76,12 +76,11 @@
     </div>
     -->
     <v-form class="mt-12 pt-4 pr-4 pl-4">
-    <div v-for="item in lecture2" :key="item.question_no"> 
-    <v-file-input @change="processFile($event)" label="upload"></v-file-input>
+    <div v-for="item in lecture2" :key="item.question_no" > 
+    <v-file-input accept="video/*,audio/*,image/*" @change="processFile($event, item)" label="업로드"></v-file-input>
     <span>{{item.question_no + ". 받아쓰기 정답등록"}}</span>
     <v-text-field
         :headers="headers2"
-        :items="lecture2"
         label="정답"
         outlined
         v-model="item.question"
@@ -89,7 +88,7 @@
     ></v-text-field>
     </div>
     <v-flex class="text-center">
-        <v-btn width="270" color="primary" x-large @click="test()">등록</v-btn>
+        <v-btn width="270" color="primary" x-large @click="submit()">등록</v-btn>
     </v-flex>
  </v-form>
     </v-card>
@@ -124,29 +123,6 @@ import router from '../router'
           { text: '작성자', value: 'courseDate' },
           { text: '조회', value: 'actions', sortable: false },
         ],
-        desserts: [
-          {
-            courseName: '1반 받아쓰기',
-            grade: 1,
-            teacher: "홍길동",
-            courseDate: "5.16 - 6.26",
-        
-          },
-          {
-            courseName: '2반 받아쓰기',
-            grade: 1,
-            teacher: "사오정",
-            courseDate: "5.16 - 6.26",
-      
-          },
-          {
-            courseName: '3반 받아쓰기',
-            grade: 1,
-            teacher: "삼장",
-            courseDate: "5.16 - 6.26",
-      
-          },
-        ],
         headers2: [
           {text:'No', value:'board_cd'},
           {
@@ -175,26 +151,58 @@ import router from '../router'
           { text: '받아쓰기 점수', value: 'lecture_level' },
         ],
         lecture2: [
-      {question_no: 1, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null },
-      {question_no: 2, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 3, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 4, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 5, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 6, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 7, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 8, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 9, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
-      {question_no: 10, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null},
+      {question_no: 1, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 2, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 3, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 4, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 5, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 6, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 7, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 8, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 9, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
+      {question_no: 10, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
       ],
       el: '#choice',
-     items: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-      fileTest: ''
+      //files:[],
       }
   },
     methods: {
-      goCource() {
-        router.push({name: 'sWrite'});
-      }
+      submit() {
+        //alert('오는가?');
+        for(let item of this.lecture2) {
+
+          const formData = new FormData();
+          formData.append('course_no', item.course_no);
+          formData.append('question', item.question);
+          formData.append('question_no', item.question_no);
+          formData.append("file", item.file);
+          console.log(item.file);
+
+          //alert('오는가2?');
+          this.$http.post('/api/course',formData).then(res => {
+            console.log(res);
+            //alert('오는가3?');
+            router.push({path: 'tmain'})
+          }).catch(err => {
+            //alert('오는가4?');
+            console.error(err);
+          })
+        }
+
+      //파일 저장
+      // this.$http.post('/api/course/fileupload',formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data'
+      //   }
+      // }).then(res => {
+      //   console.log(res);
+      // }).catch(err => {
+      //   console.error(err);
+      // })
+    },
+    processFile(file, item) {
+      item.file = file;
     }
   }
+}
 </script>

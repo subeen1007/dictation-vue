@@ -74,11 +74,20 @@
     <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
-      :items="lectures"
+      :items="mylectures"
       :search="search2"
     >
-    <template v-slot:item.actions="{ }"><!--이렇게 해야td안에 들어감-->
-          <v-btn small color="primary" dark class="ml-5" @click="gotmain()">강좌로 들어가기</v-btn>
+    <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
+        <tr>
+          <td>{{row.item.lecture_no}}</td>
+          <td>{{row.item.lecture_nm}}</td>
+          <td>{{row.item.grade}}</td>
+          <td>{{row.item.teacher_nm}}</td>
+          <td>{{row.item.enroll_ed_dt}}</td>
+          <td>
+            <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">강좌로 들어가기</v-btn>
+          </td>
+        </tr>
     </template>
     </v-data-table>
     </v-card>
@@ -98,6 +107,7 @@ import router from '../router'
         search: '',
         courseTabs: ["강좌리스트", "개설강좌"],
         headers: [
+          { text: '강좌코드', value: 'lecture_no' },
           { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
           { text: '선생님', value: 'teacher_nm' },
@@ -105,6 +115,7 @@ import router from '../router'
           { text: '강좌선택', value: 'actions', sortable: false },
         ],
         headers2: [
+          { text: '강좌코드', value: 'lecture_no' },
           { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
           { text: '선생님', value: 'teacher_nm' },
@@ -114,6 +125,10 @@ import router from '../router'
         lectures:[
 
         ],
+        mylectures:[
+
+        ],
+
       }
     },
     created(){
@@ -122,14 +137,23 @@ import router from '../router'
           this.lectures=res.data;
           //console.log(res);
           //alert(JSON.stringify(this.lectures));
-    }
-    )
+    })
+    this.$http.get('/api/lecture/teach_mylec').then(res =>{
+          //console.log('status code: ${res.ban}');
+          this.mylectures=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+    })
   },
     methods: {
       gonewstudy(){
         router.push({name: 'stwr'});
       },
-      gotmain(){
+      gotmain(item){
+        this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
+          console.log(res);
+        })
+        //console.log(item.lecture_no);
         router.push({name: 'tmain'});
       }
     }

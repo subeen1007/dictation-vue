@@ -5,8 +5,6 @@
       dark
       flat
     >
-    
-
       <template v-slot:extension>
         <v-tabs
           v-model="tabs"
@@ -25,36 +23,70 @@
           
        
     <v-tabs-items v-model="tabs">
-      
       <v-tab-item>
         <v-card>
+             <v-select
+              class="float-left mt-6"
+              v-model="select"
+              :items="sign"
+              label="승인구분"
+            ></v-select>
+             <v-select
+              class="float-left mt-6"
+              v-model="select"
+              :items="identi"
+              label="신분"
+            ></v-select>
+             <v-select
+              class="float-left mt-6"
+              v-model="select"
+              :items="sex"
+              label="성별"
+            ></v-select>
+             <v-select
+              class="float-left mt-6"
+              v-model="select"
+              :items="age"
+              label="학년"
+            ></v-select>
           <v-card-title>
              <v-select
               class="float-left mt-6"
-              v-model="searchs"
-              :items="searchs"
-              label="검색조건"
+              v-model="select"
+              :items="ban"
+              label="반"
             ></v-select>
-            <v-spacer></v-spacer>
-            <v-text-field
+          </v-card-title>
+                      <v-text-field
               v-model="search"
-              label="Search"
+              label="검색"
               single-line
               hide-details
             ></v-text-field>
-            <v-btn icon color="indigo" class="pt-4">
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-          </v-card-title>
+            <br>
+        <v-flex class="text-right">
+        <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">엑셀업로드</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="submit()">추가</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="submit()">삭제</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="submit()">저장</v-btn>
+        <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">승인</v-btn>
+    </v-flex>
           <!-- 강좌 리스트-->
           <v-data-table 
             :headers="headers"
             :items="lectures"
             :search="search"
           >
-        <template v-slot:item.actions="{ item }">
-          <v-btn class="mr-5" small color="primary" @click="{item}" >학습자료보기</v-btn>
-        </template>
+              <template v-slot:item="row">
+        <tr>
+          <td><input type="checkbox" v-model="checkboxNames"></td>
+          <slot name="list" :row="row"></slot>
+          <td>{{row.item.lecture_nm}}</td>
+          <td>{{row.item.grade}}</td>
+          <td>{{row.item.teacher_nm}}</td>
+          <td>{{row.item.enroll_ed_dt}}</td>
+        </tr>
+    </template>
         </v-data-table>
         </v-card>
       </v-tab-item>
@@ -70,15 +102,24 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
-    <!-- 개설 강좌-->
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">추가</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">삭제</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">저장</v-btn>
+    <!-- 회원관리-->
     <v-data-table
       :headers="headers2"
       :items="lectures"
       :search="search2"
     >
-    <template v-slot:item.actions="{ }"><!--이렇게 해야td안에 들어감 -->
-          <v-btn small color="primary" dark class="ml-5" @click="gotmain()">강좌개설하기</v-btn>
+    <template v-slot:item="row">
+        <tr>
+          <td><input type="checkbox" id="checkbox"></td>
+          <td>{{row.item.lecture_nm}}</td>
+          <td>{{row.item.grade}}</td>
+          <td>{{row.item.teacher_nm}}</td>
+          <td>{{row.item.enroll_ed_dt}}</td>
+          <td><input type="checkbox" id="checkbox"></td>
+        </tr>
     </template>
     </v-data-table>
     </v-card>
@@ -94,22 +135,34 @@ import router from '../router'
     data () {
       return {
         tabs: null,
-        searchs:["제목","선생님","학년"],
+        sign:["신청", "대기중", "승인완료"],
+        identi:["학생", "선생님", "관리자"],
+        sex:["남", "여"],
+        age:["1학년", "2학년","3학년","4학년","5학년","6학년"],
+        ban:["1반","2반","3반","4반","5반","6반","7반","9반","10반","11반"],
         search: '',
         courseTabs: ["회원관리", "년도/학기", "공통코드"],
         headers: [
-          { text: '강좌명', value: 'lecture_nm' },
-          { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teacher_nm' },
-          { text: '신청기간', value: 'enroll_ed_dt' },
-          { text: '강좌선택', value: 'actions', sortable: false },
+          { text: '선택', value: 'checkbox'},
+          { text: '번호', value: 'lecture_nm' },
+          { text: '승인구분', value: 'grade' },
+          { text: '신분', value: 'teacher_nm' },
+          { text: '아이디', value: 'enroll_ed_dt' },
+          { text: '이름', value: 'actions', sortable: false },
+          { text: '성별', value: 'enroll_ed_dt' },
+          { text: '생년월일', value: 'enroll_ed_dt' },
+          { text: '학년', value: 'enroll_ed_dt' },
+          { text: '반', value: 'enroll_ed_dt' },
+          { text: '연락처', value: 'enroll_ed_dt' },
+          { text: '가입일', value: 'enroll_ed_dt' },
         ],
         headers2: [
-          { text: '강좌명', value: 'lecture_nm' },
-          { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teacher_nm' },
-          { text: '신청기간', value: 'enroll_ed_dt' },
-          { text: '강좌선택', value: 'actions', sortable: false },
+          { text: '선택', value: 'lecture_nm' },
+          { text: '년도', value: 'grade' },
+          { text: '학기', value: 'teacher_nm' },
+          { text: '관리시작일', value: 'enroll_ed_dt' },
+          { text: '관리종료일', value: 'actions', sortable: false },
+          { text: '사용여부', value: 'enroll_ed_dt' },
         ],
         lectures:[
 
@@ -124,6 +177,21 @@ import router from '../router'
           //alert(JSON.stringify(this.lectures));
     }
     )
+  },
+  allMarked: {
+            // 전체 체크박스가 체크 되었는지 계산한다.
+            get: function() {
+                for (let i=0,len=this.list.length;i<len;i++) {
+                    if (!this.list[i].checked) return false;
+                }
+                return true;
+            },
+            // 전체 체크박스의 상태를 변경한다.
+            set: function(v) {
+                for (let i=0,len=this.list.length;i<len;i++) {
+                    this.list[i].checked = v;
+                }
+            }
   },
     methods: {
       gonewstudy(){
