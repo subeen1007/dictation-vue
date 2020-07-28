@@ -56,7 +56,7 @@ export default {
       
       for(let item of this.answers) {
        
-        this.$http.post('/api/course',item).then(res => {
+        this.$http.post('/api/teacher/course',item).then(res => {
           console.log(res);
           router.push({path: '/home'})
         }).catch(err => {
@@ -64,17 +64,6 @@ export default {
         })
       }
      
-    
-      //파일 저장
-      // this.$http.post('/api/course/fileupload',formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data'
-      //   }
-      // }).then(res => {
-      //   console.log(res);
-      // }).catch(err => {
-      //   console.error(err);
-      // })
     },
     processFile(file) {
       this.fileTest = file;

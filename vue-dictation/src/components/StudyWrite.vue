@@ -113,7 +113,7 @@ import router from '../router'
     methods: {
       sumbit(){
       
-          this.$http.post('/api/lecture', this.lecture).then(res =>{
+          this.$http.post('/api/teacher/lecture', this.lecture).then(res =>{
               console.log(res);
               router.push({name: 'Home'});
           }).catch(err=>{

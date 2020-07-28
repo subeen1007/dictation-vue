@@ -124,7 +124,7 @@ export default {
 
      this.score = 0;
     let i =0;
-      this.$http.post('api/enroll/answer', this.answers).then(res => {
+      this.$http.post('api/dictation/enroll/answer', this.answers).then(res => {
         for(let answer of res.data) {
           
           if(answer) {

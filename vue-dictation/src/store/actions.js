@@ -4,7 +4,7 @@ const actions = {
   // 회원가입
   signUp({commit},signUpObj) {
    
-    this.$http.post('/api/user',signUpObj).then((res) => {
+    this.$http.post('/api/common/signup',signUpObj).then((res) => {
       router.push({name:'SignIn'});
       console.log(res)
     }).catch((err) => {
@@ -13,7 +13,7 @@ const actions = {
   },
   //로그인
   signIn({commit},signInObj) {
-    this.$http.get(`/api/user/login/${signInObj.user_id}&${signInObj.pw}`).then((res)=> {
+    this.$http.get(`/api/common/login/${signInObj.user_id}&${signInObj.pw}`).then((res)=> {
       console.log("hello world1: " + res.data.loginYn);
       
       if(res.data.loginYn === '0'){

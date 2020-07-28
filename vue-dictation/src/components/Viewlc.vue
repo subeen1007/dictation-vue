@@ -51,11 +51,22 @@
             :headers="headers"
             :items="lectures"
             :search="search"
+            
           >
-        <template v-slot:item.actions="{ item }">
-          <v-btn v-if="item.lecture_check === '미신청'" class="mr-5" small color="primary" @click="sumbit(item.id)">신청하기</v-btn>
-          <v-btn v-else small color="primary" @click="cancle(item.id)">신청취소</v-btn>
-      </template>
+        <template v-slot:item="row">
+          <tr>
+            <td>{{row.item.lecture_no}}</td>
+            <td>{{row.item.lecture_nm}}</td>
+            <td>{{row.item.grade}}</td>
+            <td>{{row.item.teacher_nm}}</td>
+            <td>{{row.item.enroll_ed_dt}}</td>
+            <td>
+              <v-btn v-if="row.item.approval_cd === '승인' || row.item.approval_cd === '미승인'" class="mr-5" small color="primary" @click="cancel(row.item)">신청취소</v-btn>
+              <v-btn v-else small color="primary" @click="request(row.item)">신청하기</v-btn>
+              <!-- <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">신청하기</v-btn> -->
+            </td>
+        </tr>
+        </template>
         </v-data-table>
         </v-card>
       </v-tab-item>
@@ -71,7 +82,6 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
     <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
@@ -134,13 +144,14 @@ import router from '../router'
       }
     },
     created(){
-    this.$http.get('/api/lecture/list').then(res =>{
+    this.$http.post('/api/student/lecture/student_lec_list').then(res =>{
           console.log('status code: ${res.ban}');
           this.lectures=res.data;
           //console.log(res);
           //alert(JSON.stringify(this.lectures));
+        
     })
-    this.$http.get('/api/lecture/teach_mylec').then(res =>{
+    this.$http.post('/api/student/lecture/student_mylec').then(res =>{
           //console.log('status code: ${res.ban}');
           this.mylectures=res.data;
           //console.log(res);
@@ -148,16 +159,27 @@ import router from '../router'
     })
   },
     methods: {
-      gonewstudy(){
-        router.push({name: 'stwr'});
-      },
       gotmain(item){
-        this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
+        this.$http.get(`/api/common/lecture/lecture_no/${item.lecture_no}`).then(res =>{
           console.log(res);
         })
         //console.log(item.lecture_no);
-        router.push({name: 'tmain'});
+        router.push({name: 'studentlc'});
+      },
+      // 신청취소 버튼
+      cancel(item){
+        this.$http.get(`/api/student/enroll/delete/${item.lecture_no}`).then(res =>{
+          console.log(res);
+        })
+      },
+      //신청완료 버튼
+      request(item){
+        this.$http.get(`/api/student/enroll/insert/${item.lecture_no}`).then(res =>{
+          console.log(res);
+        })
       }
+      
+     
     }
   }
 </script>
