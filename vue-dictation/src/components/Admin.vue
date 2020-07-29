@@ -66,28 +66,33 @@
             <br>
         <v-flex class="text-right">
         <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">엑셀업로드</v-btn>
-        <v-btn width="100" color="primary" x-medium @click="submit()">추가</v-btn>
-        <v-btn width="100" color="primary" x-medium @click="submit()">삭제</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="removeRow(row)">추가</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="removeRow(row)">삭제</v-btn>
         <v-btn width="100" color="primary" x-medium @click="submit()">저장</v-btn>
         <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">승인</v-btn>
     </v-flex>
-          <!-- 강좌 리스트-->
-          <v-data-table 
-            :headers="headers"
-            :items="lectures"
-            :search="search"
+    <v-flex class="text-left">
+    <v-btn width="100" color="primary" x-medium @click="selectAll">모두 선택</v-btn>
+    <v-btn width="100" color="#FSFSFS" x-medium @click="reset">모두 해제</v-btn>
+    
+
+    </v-flex>
+          <!-- 회원관리-->
+          <v-data-table
+          :headers="headers"
+          :items="lectures"
+          :search="search2"
           >
-              <template v-slot:item="row">
+    <template v-slot:item="row">
         <tr>
-          <td><input type="checkbox" v-model="checkboxNames"></td>
-          <slot name="list" :row="row"></slot>
-          <td>{{row.item.lecture_nm}}</td>
-          <td>{{row.item.grade}}</td>
-          <td>{{row.item.teacher_nm}}</td>
-          <td>{{row.item.enroll_ed_dt}}</td>
+          <td><input type="checkbox" id="choice"></td>
+          <td><input type="text" id="lecture" v-model="row.item.lecture_nm"></td>
+          <td><input type="text" id="grade" v-model="row.item.grade"></td>
+          <td><input type="text" id="teacher" v-model="row.item.teacher_nm"></td>
+          <td><input type="text" id="enroll" v-model="row.item.enroll_ed_dt"></td>
         </tr>
     </template>
-        </v-data-table>
+    </v-data-table>
         </v-card>
       </v-tab-item>
      <v-tab-item>
@@ -102,32 +107,87 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">추가</v-btn>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">삭제</v-btn>
-    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">저장</v-btn>
-    <!-- 회원관리-->
+    <!-- 년도/학기-->
+     <v-flex class="text-right">
+    <v-btn small color="primary" dark class="ml-5" @click="addRow">추가</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="yearsave()">저장</v-btn>
+     </v-flex>
     <v-data-table
       :headers="headers2"
-      :items="lectures"
+      :items="rows"
       :search="search2"
     >
-    <template v-slot:item="row">
-        <tr>
-          <td><input type="checkbox" id="checkbox"></td>
-          <td>{{row.item.lecture_nm}}</td>
-          <td>{{row.item.grade}}</td>
-          <td>{{row.item.teacher_nm}}</td>
-          <td>{{row.item.enroll_ed_dt}}</td>
-          <td><input type="checkbox" id="checkbox"></td>
+    <template v-slot:item="">
+        <tr v-for="row in rows" v-bind:key="row">
+          <td><input type="checkbox" id="choice"></td>
+          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
+          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
+          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
+          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
+          <td><input type="checkbox" id="study_use"></td>
+          <td><a @click="removeRow(row)">Remove</a></td>
         </tr>
     </template>
     </v-data-table>
     </v-card>
     </v-tab-item>
+         <v-tab-item>
+           <!-- 대코드-->
+           <v-flex class="text-right">
+    <button class="button btn-primary" @click="addRow2">추가하기</button>
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">삭제</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="daecodesave()">저장</v-btn>
+     </v-flex>
+     <v-card class="mx-auto">
+      <v-spacer></v-spacer>
+       <v-data-table
+        :headers="headers3"
+        :items="rows2"
+       >
+       <template v-slot:item="">
+        <tr v-for="row in rows" v-bind:key="row">
+          <td><input type="checkbox" id="choice"></td>
+          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
+          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
+          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
+          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
+          <td><input type="checkbox" id="study_use"></td>
+          <td><a @click="removeRow(row)">Remove</a></td>
+        </tr>
+    </template>
+       </v-data-table>
+     </v-card>
+    </v-tab-item>
+         <v-tab-item>
+           <!-- 소코드-->
+           <v-flex class="text-right">
+             <button class="button btn-primary" @click="addRow3">추가하기</button>
+    <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">삭제</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="socodesave()">저장</v-btn>
+     </v-flex>
+     <v-card class="mx-auto">
+      <v-spacer></v-spacer>
+       <v-data-table
+        :headers="headers4"
+        :items="rows3"
+       ></v-data-table>
+       <template v-slot:item="">
+        <tr v-for="row in rows" v-bind:key="row">
+          <td><input type="checkbox" id="choice"></td>
+          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
+          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
+          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
+          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
+          <td><input type="checkbox" id="study_use"></td>
+          <td><a @click="removeRow(row)">Remove</a></td>
+        </tr>
+    </template>
+     </v-card>
+    </v-tab-item>
     </v-tabs-items>
   </v-card>
 </template>
-
+<script lang="javascript" src="dist/xlsx.full.min.js"></script>
 <script>
 import router from '../router'
   export default {
@@ -141,10 +201,9 @@ import router from '../router'
         age:["1학년", "2학년","3학년","4학년","5학년","6학년"],
         ban:["1반","2반","3반","4반","5반","6반","7반","9반","10반","11반"],
         search: '',
-        courseTabs: ["회원관리", "년도/학기", "공통코드"],
+        courseTabs: ["회원관리", "년도/학기", "대코드", "소코드"],
         headers: [
           { text: '선택', value: 'checkbox'},
-          { text: '번호', value: 'lecture_nm' },
           { text: '승인구분', value: 'grade' },
           { text: '신분', value: 'teacher_nm' },
           { text: '아이디', value: 'enroll_ed_dt' },
@@ -164,13 +223,29 @@ import router from '../router'
           { text: '관리종료일', value: 'actions', sortable: false },
           { text: '사용여부', value: 'enroll_ed_dt' },
         ],
-        lectures:[
-
+        headers3: [
+          {text: '선택', value: 'checkbox'},
+          {text: '대코드', value: 'daecode'},
+          {text: '대코드명', value: 'daecodename'},
+          {text: '비고', value: 'note'},
         ],
+        headers4: [
+          {text: '선택', value: 'checkbox'},
+          {text: '소코드', value: 'socode'},
+          {text: '소코드명', value: 'socodename'},
+          {text: '비고', value: 'name'},
+        ],
+        lectures:[
+          
+        ],
+        rows:[],
+        rows2:[],
+        rows3:[],
+        rows4:[],
       }
     },
     created(){
-    this.$http.get('/api/lecture/list').then(res =>{
+    this.$http.get('/api/common/lecture/list').then(res =>{
           console.log('status code: ${res.ban}');
           this.lectures=res.data;
           //console.log(res);
@@ -178,28 +253,75 @@ import router from '../router'
     }
     )
   },
-  allMarked: {
-            // 전체 체크박스가 체크 되었는지 계산한다.
-            get: function() {
-                for (let i=0,len=this.list.length;i<len;i++) {
-                    if (!this.list[i].checked) return false;
-                }
-                return true;
-            },
-            // 전체 체크박스의 상태를 변경한다.
-            set: function(v) {
-                for (let i=0,len=this.list.length;i<len;i++) {
-                    this.list[i].checked = v;
-                }
-            }
-  },
     methods: {
+      //회원관리 저장
       gonewstudy(){
         router.push({name: 'stwr'});
       },
+      //년도/학기 저장
+      yearsave(){
+        router.push({name: 'stwr'});
+      },
+      //대코드 저장
+      daecodesave(){
+        router.push({name: 'stwr'});
+      },
+      //소코드 저장
+      socodesave(){
+        router.push({name: 'stwr'});
+      },
+      //로그인 화면으로가기
       gotmain(){
-        router.push({name: 'tmain'});
-      }
+        router.push({name: 'Home'});
+      },
+      //row바 회원관리 추가
+      addRow4: function(){
+      this.rows4.push({name:"",job:""});
+      alert('aa');
+      console.log(this.rows)
+      },
+      //row바 년도/학기 추가 
+      addRow: function(){
+      this.rows.push({name:"",job:""});
+      alert('aa');
+      console.log(this.rows)
+      },
+      //row바 대코드 추가
+      addRow2: function(){
+        this.rows2.push({name:'',job:''})
+        alert('b');
+        console.log(this.rows2)
+      },
+      //row바 소코드 추가
+      addRow3: function(){
+        this.rows3.push({name:'',job:''})
+        alert('c');
+        console.log(this.rows3)
+      },
+      //row바 회원관리 삭제
+      removeRow: function(row){
+        alert('bb');
+        //console.log(row);
+        this.rows.$remove(row);
+      },
+      //row바 년도/학기 삭제
+      //row바 대코드 삭제
+      //row바 소코드 삭제
+      //엑셀 업로드테스트 엑셀 결과를 lectures으로 보냄 https://godd.tistory.com/41
+      importExcel(event) {
+      const file = event.target.files[0];
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        let data = reader.result;
+        // let data = e.target.result;
+        let workbook = XLSX.read(data, {type: 'binary'});
+        workbook.SheetNames.forEach(sheetName => {
+            const roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+            this.lectures.push(roa);
+          });
+      };
+      reader.readAsBinaryString(file);
+      },
     }
   }
 </script>

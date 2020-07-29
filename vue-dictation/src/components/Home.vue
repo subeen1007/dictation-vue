@@ -123,22 +123,19 @@ import router from '../router'
           { text: '강좌선택', value: 'actions', sortable: false },
         ],
         lectures:[
-
         ],
         mylectures:[
-
         ],
-
       }
     },
     created(){
-    this.$http.get('/api/lecture/list').then(res =>{
+    this.$http.get('/api/common/lecture/list').then(res =>{
           console.log('status code: ${res.ban}');
           this.lectures=res.data;
           //console.log(res);
           //alert(JSON.stringify(this.lectures));
     })
-    this.$http.get('/api/lecture/teach_mylec').then(res =>{
+    this.$http.get('/api/teacher/lecture/teach_mylec').then(res =>{
           //console.log('status code: ${res.ban}');
           this.mylectures=res.data;
           //console.log(res);
@@ -150,7 +147,7 @@ import router from '../router'
         router.push({name: 'stwr'});
       },
       gotmain(item){
-        this.$http.get(`/api/lecture/lecture_no/${item.lecture_no}`).then(res =>{
+        this.$http.get(`/api/common/lecture/lecture_no/${item.lecture_no}`).then(res =>{
           console.log(res);
         })
         //console.log(item.lecture_no);

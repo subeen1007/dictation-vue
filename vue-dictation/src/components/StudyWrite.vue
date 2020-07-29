@@ -27,6 +27,8 @@
         <v-card>
           <v-card-title>
           </v-card-title>
+
+        
           <div>
           <input v-model="lecture.lecture_nm" id="LECTURE_NM" placeholder="강좌이름">
           </div>
@@ -76,12 +78,11 @@
 
 <script>
 import router from '../router'
-
   export default {
     
     data: () =>({
             
-      courseTabs: ["강좌등록"],
+      courseTabs: ["강좌등록", "받아쓰기 등록"],
       tabs: null,
       text:"",
       //데이터를 넣기위해선 함수형태여야함(data:()=>({})형태)
@@ -111,7 +112,7 @@ import router from '../router'
     methods: {
       sumbit(){
       
-          this.$http.post('/api/lecture', this.lecture).then(res =>{
+          this.$http.post('/api/teacher/lecture', this.lecture).then(res =>{
               console.log(res);
               router.push({name: 'Home'});
           }).catch(err=>{

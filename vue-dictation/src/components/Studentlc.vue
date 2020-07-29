@@ -143,13 +143,13 @@
     },
     // 음성파일 들고오기 예시
     created(){
-    this.$http.get('/api/lecture/list').then(res =>{
+    this.$http.get('/api/common/lecture/list').then(res =>{
           console.log('status code: ${res.ban}');
           this.lectures=res.data;
           //console.log(res);
           //alert(JSON.stringify(this.lectures));
     })
-    this.$http.get('/api/lecture/teach_mylec').then(res =>{
+    this.$http.get('/api/teacher/lecture/teach_mylec').then(res =>{
           //console.log('status code: ${res.ban}');
           this.mylectures=res.data;
           //console.log(res);
@@ -158,10 +158,9 @@
   },
     methods: {
     answersubmit() {
-
      this.score = 0;
     let i =0;
-      this.$http.post('api/enroll/answer', this.answers).then(res => {
+      this.$http.post('api/dictation/enroll/answer', this.answers).then(res => {
         for(let answer of res.data) {
           
           if(answer) {
@@ -187,7 +186,7 @@
       this.dialog = false
     },
     goLecture() {
-      router.push({path: '/readlc'})
+      router.push({path: '/studentlc'})
     }
   }
 }
