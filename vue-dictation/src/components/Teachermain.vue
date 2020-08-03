@@ -245,6 +245,7 @@ import router from '../router'
         ],
       el: '#choice',
       dic_empty:null,
+      submit_yn:1,//등록가능 여부(가능1, 불가능0)
       //files:[],
       }
   },
@@ -252,6 +253,9 @@ import router from '../router'
       this.$http.post('/api/teacher/enroll/list_request').then(res =>{
         //console.log('status code: ${res.ban}');
         this.lecture3=res.data;
+        for(let lec of this.lecture3){
+          lec.gender_cd=lec.gender_cd==="002001" ? "남":"여";
+        }
       })
       //받아쓰기 등록버튼 or 수정버튼 구별(단계가 없으니 일단은 1로 설정)
       this.$http.get(`/api/teacher/course/dic_empty/${1}`).then(res =>{
@@ -274,9 +278,15 @@ import router from '../router'
     methods: {
       //등록버튼
       submit() {
-        //alert('오는가?');
-        for(let item of this.lecture2) {
-
+        for(let item1 of this.lecture2){
+          if(item1.file===null){
+            alert("파일을 모두 입력해주세요");
+            this.submit_yn=0;//등록못함
+            return;
+          }
+        }
+        if(this.submit_yn===1){
+          for(let item of this.lecture2) {
           const formData = new FormData();
           formData.append('course_no', item.course_no);
           formData.append('question', item.question);
@@ -294,6 +304,9 @@ import router from '../router'
             console.error(err);
           })
         }
+
+      }
+        
     },
 
     //수정버튼

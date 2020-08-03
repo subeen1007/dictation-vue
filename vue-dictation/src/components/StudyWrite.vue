@@ -24,7 +24,8 @@
     <v-tabs-items v-model="tabs">
       
       <v-tab-item>
-        <v-card>
+        <!-- 강좌개설하기 버튼 눌렀을때 -->
+        <v-card v-if="select_lecture===undefined">
           <v-card-title>
           </v-card-title>
 
@@ -49,15 +50,61 @@
           </div>
           <!--수강신청 및 받아쓰기 날짜 설정 필요 -->
           <v-flex class="text-center">
-
           <v-btn width="270" color="primary" x-large @click="sumbit()">등록</v-btn>
-    
+        
+          
           </v-flex>
+        </v-card>
 
-        <template v-slot:item.actions="{ item }">
-          <v-btn class="mr-5" small color="primary" @click="{item}" >학습자료보기</v-btn>
-          <v-btn small color="primary" @click="goCource()">시작하기</v-btn>
-        </template>
+        <!-- 강좌 수정/삭제 버튼 눌렀을때 -->
+        <v-card v-else>
+          <v-card-title>
+          </v-card-title>
+          <v-text-field
+          label="강좌이름"
+          outlined
+          v-model="select_lecture.lecture_nm"
+          dense>
+          ></v-text-field>
+          <v-text-field
+          label="학교이름"
+          outlined
+          v-model="select_lecture.school_cd"
+          dense>
+          ></v-text-field>
+          <v-text-field
+          label="학년"
+          outlined
+          v-model="select_lecture.grade"
+          dense>
+          ></v-text-field>
+          <v-text-field
+          label="반"
+          outlined
+          v-model="select_lecture.ban"
+          dense>
+          ></v-text-field>
+          <v-text-field
+          label="강좌등록 선생님 이름"
+          outlined
+          v-model="select_lecture.teacher_nm"
+          dense>
+          ></v-text-field>
+          <v-text-field
+          label="수강최대 인원"
+          outlined
+          v-model="select_lecture.max_cnt"
+          dense>
+          ></v-text-field>
+
+          <!--수강신청 및 받아쓰기 날짜 설정 필요 -->
+          <v-flex class="text-center">          
+          <div>
+            <v-btn width="135" color="primary" x-large @click="lecture_update()">수정</v-btn>
+            <v-btn width="135" color="primary" x-large @click="lecture_delete()">삭제</v-btn>
+          </div>
+          
+          </v-flex>
         </v-card>
       </v-tab-item>
       <v-flex class="text-center">
@@ -82,7 +129,7 @@ import router from '../router'
   export default {
     
     data: () =>({
-            
+      select_lecture:[],      
       courseTabs: ["강좌등록", "받아쓰기 등록"],
       tabs: null,
       text:"",
@@ -110,6 +157,12 @@ import router from '../router'
       
     }),
     
+    created(){
+      this.$http.get(`/api/common/lecture/get/${this.$route.params.select_lecture}`).then(res =>{
+          this.select_lecture=res.data;
+      })
+    },
+    
     methods: {
       sumbit(){
       
@@ -118,12 +171,23 @@ import router from '../router'
               router.push({name: 'Home'});
           }).catch(err=>{
               console.error(err);
-          })
-          
+          }) 
       },
-      goCource() {
-        router.push({name: 'stwr'});
+      //강좌수정
+      lecture_update(){
+        this.$http.post('/api/common/lecture/update',this.select_lecture).then(res =>{
+          console.log(res);
+          router.push({name: 'Home'});
+        })
+      },
+      //강좌삭제
+      lecture_delete(){
+        this.$http.get(`/api/common/lecture/delete/${this.$route.params.select_lecture}`).then(res =>{
+          console.log(res);
+          router.push({name: 'Home'});
+        })
       }
+
     }
   }
 </script>

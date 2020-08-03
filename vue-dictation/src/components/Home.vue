@@ -71,6 +71,7 @@
       ></v-text-field>
     </v-card-title>
     <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
+    <v-btn small color="primary" dark class="ml-6" @click="lecture_rd()">수정/삭제</v-btn>
     <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
@@ -79,6 +80,10 @@
     >
     <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
         <tr>
+          <input type="radio" id="radio" 
+          :value="row.item.lecture_no"
+          v-model="selected"
+          >
           <td>{{row.item.lecture_no}}</td>
           <td>{{row.item.lecture_nm}}</td>
           <td>{{row.item.grade}}</td>
@@ -103,6 +108,7 @@ import router from '../router'
     data () {
       return {
         tabs: null,
+        selected: [],
         searchs:["제목","선생님","학년"],
         search: '',
         courseTabs: ["강좌리스트", "개설강좌"],
@@ -115,6 +121,7 @@ import router from '../router'
           { text: '강좌선택', value: 'actions', sortable: false },
         ],
         headers2: [
+          { text: '선택', value: 'checkbox'},
           { text: '강좌코드', value: 'lecture_no' },
           { text: '강좌명', value: 'lecture_nm' },
           { text: '학년', value: 'grade' },
@@ -155,6 +162,14 @@ import router from '../router'
         })
         //console.log(item.lecture_no);
         router.push({name: 'tmain'});
+      },
+      //강좌 수정/삭제 버튼
+      lecture_rd(){
+        if(this.selected==""){
+          alert("선택된 강좌가 없습니다.");
+        }else{
+          router.push({name: 'stwr', params:{"select_lecture":this.selected}});
+        }
       }
     }
   }
