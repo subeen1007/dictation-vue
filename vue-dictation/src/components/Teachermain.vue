@@ -192,6 +192,16 @@
         </tr>
       </template>
       </v-data-table>
+       <v-data-table
+        v-model="selected"
+        :headers="headers4"
+        :items="lecture3"
+        :search="search3"
+        item-key="name"
+        show-select
+        class="elevation-1"
+       >
+       </v-data-table>
      </v-card>
     </v-tab-item>
     </v-tabs-items>
@@ -318,13 +328,14 @@ import router from '../router'
         }
         if(this.submit_yn===1){
           for(let item of this.lecture2) {
+        //alert('오는가?');
+        for(let item of this.lecture2) {
           const formData = new FormData();
           formData.append('course_no', item.course_no);
           formData.append('question', item.question);
           formData.append('question_no', item.question_no);
           formData.append("file", item.file);
           console.log(item.file);
-
           //alert('오는가2?');
           this.$http.post('/api/teacher/course',formData).then(res => {
             console.log(res);
@@ -339,19 +350,16 @@ import router from '../router'
       }
         
     },
-
     //수정버튼
     modify() {
         //alert('오는가?');
         for(let item of this.lecture2) {
-
           const formData = new FormData();
           formData.append('course_no', item.course_no);
           formData.append('question', item.question);
           formData.append('question_no', item.question_no);
           formData.append("file_nm", item.file_nm);
           formData.append("change_file ", item.change_file );
-
           //alert('오는가2?');
           this.$http.post('/api/teacher/course/dic_modify',formData).then(res => {
             console.log(res);
@@ -370,7 +378,6 @@ import router from '../router'
         this.$http.get(`/api/teacher/enroll/update/${item.user_id}`).then(res =>{
         console.log(res);
         })
-        
       }
     },
     //등록

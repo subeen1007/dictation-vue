@@ -65,7 +65,7 @@
  <v-form class="mt-12 pt-4 pr-4 pl-4">
    <div v-for="item in answers" :key="item.question_no"> 
      <span>{{item.question_no + ".   받아쓰기"}}</span>
-     <audio src="C:\\Users\\subin\\Desktop\\딕테이션_프로젝트\\각종문서\\(남성)흐흐흐흐1.wav" controls> </audio>
+     <audio src="../assets/dictation.wav" controls></audio>
     <v-text-field 
               label="정답을 적으세요."
               outlined
@@ -98,8 +98,6 @@
 
 <script>
   import router from '../router'
-  
-
   export default {
     data () {
       return {
@@ -130,16 +128,16 @@
         dialog: false,
         score: 0,
         answers: [
-          {question_no: 1, question: '', course_no: 1,hint:"",error:false, fileUrl: null},
-          {question_no: 2, question: '', course_no: 1,hint:"",error:false, fileUrl: null},
-          {question_no: 3, question: '', course_no: 1,hint:"",error:false, fileUrl: null},
-          {question_no: 4, question: '', course_no: 1, hint:"",error:false, fileUrl: null},
-          {question_no: 5, question: '', course_no: 1, hint:"",error:false, fileUrl: null},
-          {question_no: 6, question: '', course_no: 1,hint:"", error:false, fileUrl: null},
-          {question_no: 7, question: '', course_no: 1,hint:"", error:false, fileUrl: null},
-          {question_no: 8, question: '', course_no: 1,hint:"", error:false, fileUrl: null},
-          {question_no: 9, question: '', course_no: 1,hint:"", error:false, fileUrl: null},
-          {question_no: 10, question: '', course_no: 1,hint:"", error:false, fileUrl: null},
+          {question_no: 1, question: '', lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 2, question: '', lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 3, question: '',lecture_no: 1, course_no: 1,hint:"",error:false, file: null},
+          {question_no: 4, question: '',  lecture_no: 1, course_no: 1, hint:"",error:false, file: null},
+          {question_no: 5, question: '',lecture_no: 1, course_no: 1, hint:"",error:false, file: null},
+          {question_no: 6, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 7, question: '',lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 8, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 9, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
+          {question_no: 10, question: '', lecture_no: 1, course_no: 1,hint:"", error:false, file: null},
           ],
       }
     },
@@ -173,7 +171,21 @@
   },
     methods: {
     answersubmit() {
-
+    this.$http.get('/api/common/lecture/list').then(res =>{
+          console.log('status code: ${res.ban}');
+          this.lectures=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+    })
+    this.$http.get('/api/teacher/lecture/teach_mylec').then(res =>{
+          //console.log('status code: ${res.ban}');
+          this.mylectures=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+    })
+  },
+    methods: {
+    answersubmit() {
      this.score = 0;
     let i =0;
       this.$http.post('api/dictation/enroll/answer', this.answers).then(res => {

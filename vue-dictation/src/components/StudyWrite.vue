@@ -105,6 +105,14 @@
           </div>
           
           </v-flex>
+          <v-btn width="270" color="primary" x-large @click="sumbit()">등록</v-btn>
+    
+          </v-flex>
+
+        <template v-slot:item.actions="{ item }">
+          <v-btn class="mr-5" small color="primary" @click="{item}" >학습자료보기</v-btn>
+          <v-btn small color="primary" @click="goCource()">시작하기</v-btn>
+        </template>
         </v-card>
       </v-tab-item>
       <v-flex class="text-center">
@@ -156,13 +164,11 @@ import router from '../router'
       }
       
     }),
-    
     created(){
       this.$http.get(`/api/common/lecture/get/${this.$route.params.select_lecture}`).then(res =>{
           this.select_lecture=res.data;
       })
     },
-    
     methods: {
       sumbit(){
       

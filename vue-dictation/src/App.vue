@@ -113,9 +113,9 @@ export default {
     drawer: null,
     items: [
   
-      {  text: 'TeacherMain' ,path:'/home', isOpen: false},
-      { text: '수강강좌', path:'/readlc',isOpen: false},
+      {  text: '홈' ,path:'/home', isOpen: false},
       { text: '개설강좌', path:'/viewlc',isOpen: false},
+      { text: '수강강좌', path:'/readlc',isOpen: false},
       { text: '학생강좌화면', path:'/studentlc',isOpen:false},
       { text: '받아쓰기등록', path:'/write',isOpen:false},
       { text: '받아쓰기', path:'/s_write', isOpen:false},
@@ -156,7 +156,7 @@ export default {
     SorT : function(data) {
       if(data !== "학생"){
       
-        this.items[4].isOpen = true;
+        this.items[4].isOpen = false;
         this.items[0].isOpen = true;
 
         this.items[5].isOpen = false;
