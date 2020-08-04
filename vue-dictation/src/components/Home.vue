@@ -80,10 +80,12 @@
     >
     <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
         <tr>
-          <input type="radio" id="radio" 
-          :value="row.item.lecture_no"
-          v-model="selected"
-          >
+          <th width="50">
+            <input type="radio" id="radio" 
+            :value="row.item.lecture_no"
+            v-model="selected"
+            >
+          </th>
           <td>{{row.item.lecture_no}}</td>
           <td>{{row.item.lecture_nm}}</td>
           <td>{{row.item.grade}}</td>

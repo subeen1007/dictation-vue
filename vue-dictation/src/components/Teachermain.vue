@@ -70,6 +70,21 @@
     </div>
     -->
     <!-- 받아쓰기 등록-->
+    <v-card-text class="pt-0">
+      <div style="max-height: 0px; margin-top: 50px;">
+      <v-slider
+        v-model="step_value"
+        :tick-labels="ticksLabels"
+        label="단계"
+        step="1"
+        thumb-label="always"
+        :max="40"
+        ticks="always"
+        tick-size="1"
+        
+      ></v-slider>
+      </div>
+    </v-card-text>
     <v-form class="mt-12 pt-4 pr-4 pl-4">
     <div v-for="item in lecture2" :key="item.question_no" > 
     <span>{{" 파일명"+item.file_nm}}</span>
@@ -152,16 +167,31 @@
     </v-flex>
      <v-card class="mx-auto">
       <v-spacer></v-spacer>
-       <v-data-table
-        v-model="selected"
+      <v-data-table
         :headers="headers4"
         :items="lecture3"
         :search="search3"
-        item-key="name"
-        show-select
-        class="elevation-1"
-       >
-       </v-data-table>
+      >
+      <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
+        <tr>
+          <th width="50">
+            <input type="checkbox" id="checkbox" 
+            :value="row.item"
+            v-model="selected"
+            >
+          </th>
+          <td>{{row.item.approval_cd}}</td>
+          <td>{{row.item.user_id}}</td>
+          <td>{{row.item.kor_nm}}</td>
+          <td>{{row.item.gender_cd}}</td>
+          <td>{{row.item.birth_dt}}</td>
+          <td>{{row.item.grade}}</td>
+          <td>{{row.item.ban}}</td>
+          <td>{{row.item.cel_phone_no}}</td>
+          <td>{{row.item.register_dt}}</td>
+        </tr>
+      </template>
+      </v-data-table>
      </v-card>
     </v-tab-item>
     </v-tabs-items>
@@ -173,6 +203,7 @@ import router from '../router'
   export default {
     data () {
       return {
+        step_value: 0,
         tabs: null,
         selected: [],
         sign:["신청", "대기중", "승인완료"],

@@ -61,9 +61,9 @@
             <td>{{row.item.teacher_nm}}</td>
             <td>{{row.item.enroll_ed_dt}}</td>
             <td>
-              <v-btn v-if="row.item.approval_cd === '승인' || row.item.approval_cd === '미승인'" class="mr-5" small color="primary" @click="cancel(row.item)">신청취소</v-btn>
+              <v-btn v-if="row.item.approval_cd === '미승인'" class="mr-5" small color="error" @click="cancel(row.item)">신청취소</v-btn>
+              <v-btn v-else-if="row.item.approval_cd === '승인'" class="mr-6" small color="success">승인완료</v-btn>
               <v-btn v-else small color="primary" @click="request(row.item)">신청하기</v-btn>
-              <!-- <v-btn small color="primary" dark class="ml-5" @click="gotmain(row.item)">신청하기</v-btn> -->
             </td>
         </tr>
         </template>
