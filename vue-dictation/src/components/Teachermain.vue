@@ -49,9 +49,100 @@
           <!-- 공지사항-->
           <v-data-table
             :headers="headers"
-            :items="desserts"
-            :search="search"
+            :items="notice"
+            sort-by="title"
+            class="elevation-1"
           >
+          <template slot="items" slot-scope="props">
+            <td :class="headers[0].class"><a small flat class="text-capitalize" left @click="read(props.item)"> {{ props.item.title }}</a></td>
+          </template>
+          <!-- 예시
+  <template slot="items" slot-scope="props">
+            <td :class="headers[0].class">{{ id2date(props.item._id)}}</td>
+            <td :class="headers[1].class"><a small flat class="text-capitalize" left @click="read(props.item)"> {{ props.item.title }}</a></td>
+            <td :class="headers[2].class">{{ props.item._user ? props.item._user.id : '손님' }}</td>
+            <td :class="headers[3].class">{{ props.item.cnt.view }}</td>
+            <td :class="headers[4].class">{{ props.item.cnt.like }}</td>
+  </template>
+  -->
+          <template v-slot:top>
+      <v-toolbar flat color="white">
+        <v-toolbar-title>공지 사항</v-toolbar-title>
+        <v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+        <v-spacer></v-spacer>
+        <v-dialog v-model="dialog" max-width="500px">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2"
+              v-bind="attrs"
+              v-on="on"
+            >글 작성하기</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">{{ formTitle }}</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="editedItem.title" label="제목"></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="editedItem.content" label="내용"></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                      <v-file-input @change="boardFile1($event)" label="업로드"></v-file-input>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="close">취소</v-btn>
+              <v-btn color="blue darken-1" text @click="save">저장</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dlRead" persistent max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{formTitle}}</span>
+        </v-card-title>
+        <v-card-text>
+          {{formTitle}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" flat @click.native="dlRead = false">닫기</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+      </v-toolbar>
+    </template>
+    <template v-slot:item.actions="{ item }">
+      <v-icon
+        small
+        class="mr-2"
+        @click="editItem(item)"
+      >
+        mdi-pencil
+      </v-icon>
+      <v-icon
+        small
+        @click="deleteItem(item)"
+      >
+        mdi-delete
+      </v-icon>
+    </template>
         </v-data-table>
         </v-card>
       </v-tab-item>
@@ -71,24 +162,28 @@
     -->
     <!-- 받아쓰기 등록-->
     <v-card-text class="pt-0">
-      <div style="max-height: 0px; margin-top: 50px;">
+      <div style="max-height: 40px; margin-top: 50px;">
       <v-slider
         v-model="step_value"
         :tick-labels="ticksLabels"
+        readonly
         label="단계"
         step="1"
         thumb-label="always"
         :max="40"
+        :min="1"
         ticks="always"
-        tick-size="1"
+        tick-size="3"
         
       ></v-slider>
+      <v-btn width-right="60" color="primary" @click="minus_step()">1단계-</v-btn>
+      <v-btn width-left="60" color="primary" @click="plus_step()">1단계+</v-btn>
       </div>
     </v-card-text>
     <v-form class="mt-12 pt-4 pr-4 pl-4">
     <div v-for="item in lecture2" :key="item.question_no" > 
     <span>{{" 파일명"+item.file_nm}}</span>
-    <v-file-input v-if="dic_empty===0" accept="video/*,audio/*,image/*" @change="processFile1($event, item)" label="업로드"></v-file-input>
+    <v-file-input v-if="max_dic_course<step_value" accept="video/*,audio/*,image/*" @change="processFile1($event, item)" label="업로드"></v-file-input>
     <v-file-input v-else accept="video/*,audio/*,image/*" @change="processFile2($event, item)" label="파일이름이 올라올것"></v-file-input>
     <span>{{item.question_no + ". 받아쓰기 정답등록"}}</span>
     <v-text-field
@@ -100,8 +195,11 @@
     ></v-text-field>
     </div>
     <v-flex class="text-center">
-        <v-btn v-if="dic_empty===0" width="270" color="primary" x-large @click="submit()">등록</v-btn>
-        <v-btn v-else width="270" color="primary" x-large @click="modify()">수정</v-btn>
+        <v-btn v-if="max_dic_course<step_value" width="170" color="primary" x-large @click="submit()">등록</v-btn>
+        <v-btn v-else width="170" color="primary" x-large @click="modify()">수정</v-btn>
+        <v-btn v-if="lecture2[1].finish_yn==='1'" width="170" color="disabled" x-large >완료</v-btn>
+        <v-btn v-else width="170" color="primary" x-large @click="finish()">완료</v-btn>
+        
     </v-flex>
     </v-form>
     </v-card>
@@ -201,9 +299,34 @@
 <script>
 import router from '../router'
   export default {
+    created(){
+      this.$http.post('/api/teacher/enroll/list_request').then(res =>{
+        //console.log('status code: ${res.ban}');
+        this.lecture3=res.data;
+        for(let lec of this.lecture3){
+          lec.gender_cd=lec.gender_cd==="002001" ? "남":"여";
+        }
+      })
+
+      //처음에 받아쓰기 들어갔을떄 화면(등록할 화면 또는 제일 마지막화면 나옴)
+      this.$http.get(`/api/teacher/course/max_dic_course`).then(res =>{//선생님화면 등록한 받아쓰기 최대단계
+          //console.log('status code: ${res.ban}');
+          this.max_dic_course=res.data;
+          this.step_value = (this.max_dic_course + 1) || 40
+          this.isdictation(this.step_value);
+        })
+
+      //공지사항 목록 불러오기
+      this.$http.get(`/api/board/list/${"006001"}`).then(res =>{
+          this.notice=res.data;
+        })
+      
+    },
+
     data () {
       return {
-        step_value: 0,
+        dialog: false,
+        step_value: 1,
         tabs: null,
         selected: [],
         sign:["신청", "대기중", "승인완료"],
@@ -215,12 +338,26 @@ import router from '../router'
         search: '',
         courseTabs: ["공지사항", "받아쓰기등록","학습현황","신청현황","QnA"],
         headers: [
-          { text: 'No', value: 'Number' },
-          { text: '제목', value: 'courseName' },
-          { text: '파일', value: 'teacher' },
-          { text: '작성자', value: 'courseDate' },
-          { text: '조회', value: 'actions', sortable: false },
+          { text: '제목', value: 'title' },
+          { text: '내용', value: 'content' },
+          { text: '작성자', value: 'input_id' },
+          { text: '파일', value: 'file_nm'},
+          { text: 'Actions', value: 'actions', sortable: false },
         ],
+        editedItem: {
+          title: '',
+          content: '',
+          file:null,
+          board_cd:'001',
+        },
+        defaultItem: {
+          title: '',
+          content: '',
+          file_nm:null,
+          board_cd:'001',
+        },
+        notice: [],
+        editedIndex: -1,
         headers2: [
           {text:'No', value:'board_cd'},
           {
@@ -261,6 +398,10 @@ import router from '../router'
           { text: '가입일', value: 'register_dt' },
         ],
         lecture2: [
+        ],
+        lecture3:[
+        ],
+        lecture_value: [
       {question_no: 1, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
       {question_no: 2, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
       {question_no: 3, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
@@ -272,43 +413,74 @@ import router from '../router'
       {question_no: 9, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
       {question_no: 10, question: '', year: "2020", term: "1", lecture_no: null, course_no: 1, file_nm: null, file_save_nm: null, input_id: null, updated_id: null,update_date: null, file: null },
       ],
-        lecture3:[
-        ],
       el: '#choice',
-      dic_empty:null,
+      max_dic_course:0,
       submit_yn:1,//등록가능 여부(가능1, 불가능0)
       //files:[],
       }
   },
-    created(){
-      this.$http.post('/api/teacher/enroll/list_request').then(res =>{
-        //console.log('status code: ${res.ban}');
-        this.lecture3=res.data;
-        for(let lec of this.lecture3){
-          lec.gender_cd=lec.gender_cd==="002001" ? "남":"여";
-        }
-      })
-      //받아쓰기 등록버튼 or 수정버튼 구별(단계가 없으니 일단은 1로 설정)
-      this.$http.get(`/api/teacher/course/dic_empty/${1}`).then(res =>{
-          //console.log('status code: ${res.ban}');
-          this.dic_empty=res.data;
-          if(this.dic_empty==1){//수정
-            this.$http.get(`/api/teacher/course/dic_answers/${1}`).then(res =>{
-        
-              this.lecture2=res.data;
-            })
-            
-            console.log("1입니다!!!!!!!");
-          }else{//등록
-            console.log("없습니다!!!!");
-          }
-          //console.log(res);
-          //alert(JSON.stringify(this.lectures));
-      })
+  computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      },
+    },
+    watch: {
+      dialog (val) {
+        val || this.close()
+      },
+    },
+    created2 () {
+      this.initialize()
     },
     methods: {
+      initialize () {
+        this.notice = [
+        ]
+      },
+      editItem (item) {
+        this.editedIndex = this.notice.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+      deleteItem (item) {
+        const index = this.notice.indexOf(item)
+        confirm('정말로 삭제하시겠습니까?') && this.notice.splice(index, 1)
+      },
+      close () {
+        this.dialog = false
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      },
+      //게시판 저장
+      save () {
+        const formData = new FormData();
+        formData.append("board_cd",this.editedItem.board_cd);
+        formData.append("content",this.editedItem.content);
+        formData.append("title",this.editedItem.title);
+        if(this.editedItem.file==null){//파일없음
+          this.$http.post('/api/board/insert_nofile', formData).then(res =>{
+            console.log(res);
+          })
+        }else{//파일있음
+          formData.append("file",this.editedItem.file);
+            this.$http.post('/api/board', formData).then(res =>{
+            console.log(res);
+          })
+        }
+        this.close()
+      },
+      //받아쓰기 단계가 바뀌면 해당단계를 lecture2에 적용(등록일때)
+      isdictation(value){
+        for(let item of this.lecture_value){
+          item.course_no=value;
+        }
+        this.lecture2=this.lecture_value
+      },
       //등록버튼
       submit() {
+        this.submit_yn=1;
         for(let item1 of this.lecture2){
           if(item1.file===null){
             alert("파일을 모두 입력해주세요");
@@ -316,7 +488,9 @@ import router from '../router'
             return;
           }
         }
-        if(this.submit_yn===1){
+        console.log("1111111111111111");
+        if(this.submit_yn==1){
+          console.log("22222222222");
           for(let item of this.lecture2) {
           const formData = new FormData();
           formData.append('course_no', item.course_no);
@@ -324,11 +498,11 @@ import router from '../router'
           formData.append('question_no', item.question_no);
           formData.append("file", item.file);
           console.log(item.file);
+          console.log("333333333333");
 
-          //alert('오는가2?');
           this.$http.post('/api/teacher/course',formData).then(res => {
             console.log(res);
-            //alert('오는가3?');
+            console.log("34444444444444");
             router.push({path: 'tmain'})
           }).catch(err => {
             //alert('오는가4?');
@@ -373,6 +547,11 @@ import router from '../router'
         
       }
     },
+
+    //게시판에 파일 업로드
+    boardFile1(file){
+      this.editedItem.file=file;
+    },
     //등록
     processFile1(file, item) {
       item.file = file;
@@ -381,6 +560,39 @@ import router from '../router'
     processFile2(file, item) {
       item.file_nm = file;
       item.change_file=true;
+    },
+    minus_step(){
+      this.step_value = (this.step_value - 1) || 1
+      //받아쓰기 수정버튼
+      this.$http.get(`/api/teacher/course/dic_answers/${this.step_value}`).then(res =>{
+        this.lecture2=res.data;
+      })
+    },
+    plus_step(){
+      if(this.max_dic_course>this.step_value){//수정
+        this.step_value = (this.step_value + 1) || 40
+        this.$http.get(`/api/teacher/course/dic_answers/${this.step_value}`).then(res =>{
+          this.lecture2=res.data;
+        })
+      }else if(this.max_dic_course==this.step_value){//등록
+        this.step_value = (this.step_value + 1) || 40
+        this.isdictation(this.step_value);
+        alert("단계를 등록하세요")
+      }else{
+        alert("이번단계를 먼저 등록해야 합니다.")
+      }
+    },
+    //받아쓰기 완료버튼 눌렀을떄
+    finish(){
+        //alert('오는가2?');
+        if(this.max_dic_course<this.step_value){
+          alert("받아쓰기를 먼저 등록하세요");
+        }else{
+          this.$http.get(`/api/dictation/course/finish_yes/${this.lecture2[1].course_no}`).then(res => {
+            console.log(res);
+            alert("받아쓰기를 완료했습니다.");
+          })
+        }
     }
   }
 }

@@ -25,11 +25,11 @@
       
       <v-tab-item>
         <!-- 강좌개설하기 버튼 눌렀을때 -->
-        <v-card v-if="select_lecture===undefined">
+        <v-card>
           <v-card-title>
           </v-card-title>
-
-        
+          
+          <template v-if="this.$route.params.select_lecture===undefined">
           <div>
           <input v-model="lecture.lecture_nm" id="LECTURE_NM" placeholder="강좌이름">
           </div>
@@ -50,16 +50,12 @@
           </div>
           <!--수강신청 및 받아쓰기 날짜 설정 필요 -->
           <v-flex class="text-center">
-          <v-btn width="270" color="primary" x-large @click="sumbit()">등록</v-btn>
-        
-          
+          <v-btn width="270" color="primary" x-large @click="sumbit()">등록</v-btn>  
           </v-flex>
-        </v-card>
+          </template>
 
-        <!-- 강좌 수정/삭제 버튼 눌렀을때 -->
-        <v-card v-else>
-          <v-card-title>
-          </v-card-title>
+          <!-- 강좌 수정/삭제 버튼 눌렀을때 -->
+          <template v-else>
           <v-text-field
           label="강좌이름"
           outlined
@@ -105,7 +101,10 @@
           </div>
           
           </v-flex>
+          </template>
+          
         </v-card>
+
       </v-tab-item>
       <v-flex class="text-center">
     </v-flex>
@@ -128,39 +127,42 @@ import router from '../router'
 
   export default {
     
-    data: () =>({
-      select_lecture:[],      
-      courseTabs: ["강좌등록", "받아쓰기 등록"],
-      tabs: null,
-      text:"",
-      //데이터를 넣기위해선 함수형태여야함(data:()=>({})형태)
-      //값 받아올때 lecture.lecture_nm처럼 .연산자로 값 받아와야함
-      lecture:
-      {
-        year:"",
-        term:"",
-        lecture_no:"",
-        lecture_nm:"",
-        school_cd:"",
-        grade:"",
-        ban:"",
-        enroll_st_ct:"",
-        enroll_ed_ct:"",
-        teacher_id:"",
-        teacher_nm:"",
-        max_cnt:"",// 입력자 아이디, 입력일시, 수정아이디, 수정일시 넣기 필요
-        input_id:"",
-        input_date:"",
-        update_id:"",
-        update_date:""
-      }
-      
-    }),
+    data(){
+      return{
+        courseTabs: ["강좌등록", "받아쓰기 등록"],
+        tabs: null,
+        text:"",
+        //데이터를 넣기위해선 함수형태여야함(data:()=>({})형태)
+        //값 받아올때 lecture.lecture_nm처럼 .연산자로 값 받아와야함
+        select_lecture:[],
+        lecture:
+        {
+          year:"",
+          term:"",
+          lecture_no:"",
+          lecture_nm:"",
+          school_cd:"",
+          grade:"",
+          ban:"",
+          enroll_st_ct:"",
+          enroll_ed_ct:"",
+          teacher_id:"",
+          teacher_nm:"",
+          max_cnt:"",// 입력자 아이디, 입력일시, 수정아이디, 수정일시 넣기 필요
+          input_id:"",
+          input_date:"",
+          update_id:"",
+          update_date:""
+        }
+      }      
+    },
     
     created(){
-      this.$http.get(`/api/common/lecture/get/${this.$route.params.select_lecture}`).then(res =>{
+      if(this.$route.params.select_lecture!=null){
+        this.$http.get(`/api/common/lecture/get/${this.$route.params.select_lecture}`).then(res =>{
           this.select_lecture=res.data;
-      })
+        })
+      } 
     },
     
     methods: {
