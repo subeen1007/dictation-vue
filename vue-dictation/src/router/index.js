@@ -62,7 +62,18 @@ const routes = [
     path: '/Test',
     name: 'test',
     component: () => import('../components/Test.vue')
+
+
+  },{
+    path: '/crud',
+    name: 'crud',
+    component: () => import('../components/Crud.vue')
+  },{
+    path: '/crud2',
+    name: 'crud2',
+    component: () => import('../components/Crud2.vue')
   }
+  
 
 
 ]
