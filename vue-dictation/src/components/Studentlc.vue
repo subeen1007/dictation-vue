@@ -79,6 +79,9 @@
           <v-btn width-right="60" color="primary" @click="minus_step()">1단계-</v-btn>
           <v-btn width-left="60" color="primary" @click="plus_step()">1단계+</v-btn>
         </div>
+
+  <!-- 선생님이 완료한 강좌일때 -->
+ <template v-if="finish_yes_cl.includes(step_value)">       
  <v-form class="mt-12 pt-4 pr-4 pl-4">
    <div v-for="item in answers" :key="item.question_no"> 
      <span>{{item.question_no + ".   받아쓰기"}}</span>
@@ -96,6 +99,20 @@
         <v-btn v-if="(this.step_value < this.pass_course_no+1) || (this.step_value === this.pass_course_no+1)" width="270" color="primary" x-large @click="answersubmit()">제출</v-btn>
     </v-flex>
     </v-form>
+    </template>
+
+    <!-- 선생님이 완료하지 않은 강좌일때 -->
+    <template>
+       <v-card
+    class="mx-auto"
+    max-width="344"
+    margin-top="555px"
+    outlined
+  >
+    <v-list-item-title class="headline mb-1">등록된 받아쓰기가 없습니다</v-list-item-title>
+  </v-card>
+    </template>
+
       <v-dialog v-model="dialog" persistent max-width="290">
     <v-card>
           <v-card-title class="headline">당신의 점수는?</v-card-title>
@@ -121,6 +138,7 @@
   export default {
     data () {
       return {
+        finish_yes_cl:[],//강좌에 대해 받아쓰기 완료처리된 단계들만 반환
         lecture_info:[],//강좌정보
         step_value: 1,
         pass_course_no: 0,
@@ -191,7 +209,7 @@
       })
 
 
-      //test
+      //받아쓰기 음성파일 url주소 반환
       for(let answer of this.answers){
         const formData=new FormData();
         formData.append("course_no",answer.course_no);
@@ -201,7 +219,10 @@
               console.log(res.data);
         })
       }
-      
+      //강좌에 대해 받아쓰기 완료처리된 단계들만 반환
+      this.$http.get(`api/dictation/course/finish_yes_cl`).then(res => {
+            this.finish_yes_cl=res.data;
+      })
     
   },
     methods: {
