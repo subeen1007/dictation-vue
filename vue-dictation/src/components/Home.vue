@@ -72,6 +72,7 @@
     </v-card-title>
     <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
     <v-btn small color="primary" dark class="ml-6" @click="lecture_rd()">수정/삭제</v-btn>
+    <v-btn small color="primary" dark class="ml-5" @click="gotest()">공지사항테스트</v-btn>
     <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
@@ -157,6 +158,9 @@ import router from '../router'
     methods: {
       gonewstudy(){
         router.push({name: 'stwr'});
+      },
+      gotest(){
+        router.push({name: 'test'});
       },
       gotmain(item){
         this.$http.get(`/api/common/lecture/lecture_no/${item.lecture_no}`).then(res =>{
