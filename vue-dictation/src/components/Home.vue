@@ -81,7 +81,6 @@
     >
     <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
         <tr>
-
           <th width="50">
             <input type="radio" id="radio" 
             :value="row.item.lecture_no"
@@ -132,9 +131,12 @@ import router from '../router'
           { text: '선생님', value: 'teacher_nm' },
           { text: '신청기간', value: 'enroll_ed_dt' },
           { text: '강좌선택', value: 'actions', sortable: false },
+        ],
         lectures:[
+
         ],
         mylectures:[
+
         ],
 
       }
