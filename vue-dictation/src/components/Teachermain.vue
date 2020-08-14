@@ -50,21 +50,13 @@
           <v-data-table
             :headers="headers"
             :items="notice"
+            :loading="loading"
             sort-by="title"
             class="elevation-1"
           >
-          <template slot="items" slot-scope="props">
+         <template slot="items" slot-scope="props">
             <td :class="headers[0].class"><a small flat class="text-capitalize" left @click="read(props.item)"> {{ props.item.title }}</a></td>
-          </template>
-          <!-- 예시
-  <template slot="items" slot-scope="props">
-            <td :class="headers[0].class">{{ id2date(props.item._id)}}</td>
-            <td :class="headers[1].class"><a small flat class="text-capitalize" left @click="read(props.item)"> {{ props.item.title }}</a></td>
-            <td :class="headers[2].class">{{ props.item._user ? props.item._user.id : '손님' }}</td>
-            <td :class="headers[3].class">{{ props.item.cnt.view }}</td>
-            <td :class="headers[4].class">{{ props.item.cnt.like }}</td>
-  </template>
-  -->
+        </template>
           <template v-slot:top>
       <v-toolbar flat color="white">
         <v-toolbar-title>공지 사항</v-toolbar-title>
@@ -93,13 +85,13 @@
               <v-container>
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.title" label="제목"></v-text-field>
+                    <v-text-field v-model="editedItem001.title" label="제목"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.content" label="내용"></v-text-field>
+                    <v-text-field v-model="editedItem001.content" label="내용"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
-                      <v-file-input @change="boardFile1($event)" label="업로드"></v-file-input>
+                      <v-file-input @change="boardFile1($event, editedItem001)" label="업로드"></v-file-input>
                   </v-col>
                 </v-row>
               </v-container>
@@ -108,7 +100,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close">취소</v-btn>
-              <v-btn color="blue darken-1" text @click="save">저장</v-btn>
+              <v-btn color="blue darken-1" text @click="save(editedItem001)">저장</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -143,6 +135,22 @@
         mdi-delete
       </v-icon>
     </template>
+    <!-- 공지사항 읽기 팝업 --> 
+     <v-dialog v-model="dlRead" persistent max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{rd.title}}</span>
+        </v-card-title>
+        <v-card-text>
+          {{rd.content}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" flat @click.native="dlRead = false">닫기</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- 팝업 끝-->
         </v-data-table>
         </v-card>
       </v-tab-item>
@@ -266,31 +274,116 @@
      <v-card class="mx-auto">
       <v-spacer></v-spacer>
       <v-data-table
+        v-model="selected"
         :headers="headers4"
         :items="lecture3"
         :search="search3"
+        :single-select="singleSelect"
+        item-key="user_id"
+        show-select
+        class="elevation-1"
       >
-      <template v-slot:item="row"><!--이렇게 해야td안에 들어감-->
-        <tr>
-          <th width="50">
-            <input type="checkbox" id="checkbox" 
-            :value="row.item"
-            v-model="selected"
-            >
-          </th>
-          <td>{{row.item.approval_cd}}</td>
-          <td>{{row.item.user_id}}</td>
-          <td>{{row.item.kor_nm}}</td>
-          <td>{{row.item.gender_cd}}</td>
-          <td>{{row.item.birth_dt}}</td>
-          <td>{{row.item.grade}}</td>
-          <td>{{row.item.ban}}</td>
-          <td>{{row.item.cel_phone_no}}</td>
-          <td>{{row.item.register_dt}}</td>
-        </tr>
-      </template>
       </v-data-table>
      </v-card>
+    </v-tab-item>
+    <!--QnA-->
+    <v-tab-item>
+      <v-data-table
+            :headers="headers5"
+            :items="notice2"
+            :loading="loading"
+            sort-by="title"
+            :single-expand="singleExpand"
+            :expanded.sync="expanded"
+            class="elevation-1"
+            item-key="title"
+            show-expand
+            
+          >
+          <template v-slot:top>
+        </template>
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length">{{ item.content }}</td>
+        </template>
+          <template v-slot:top>
+      <v-toolbar flat color="white">
+        <v-toolbar-title>질문게시판</v-toolbar-title>
+        <v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+        <v-spacer></v-spacer>
+        <v-dialog v-model="dialog" max-width="500px">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2"
+              v-bind="attrs"
+              v-on="on"
+            >글 작성하기</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">{{ formTitle }}</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="editedItem003.title" label="제목"></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="editedItem003.content" label="내용"></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                      <v-file-input @change="boardFile1($event, editedItem003)" label="업로드"></v-file-input>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="close">취소</v-btn>
+              <v-btn color="blue darken-1" text @click="save(editedItem003)">저장</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dlRead" persistent max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{formTitle}}</span>
+        </v-card-title>
+        <v-card-text>
+          {{formTitle}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" flat @click.native="dlRead = false">닫기</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+      </v-toolbar>
+    </template>
+    <template >
+      <!--<v-icon
+        small
+        class="mr-2"
+        @click="editItem(item)"
+      >
+        mdi-pencil
+      </v-icon>
+      <v-icon
+        small
+        @click="deleteItem(item)"
+      >
+        mdi-delete
+      </v-icon>-->
+    </template>
+        </v-data-table>
     </v-tab-item>
     </v-tabs-items>
   </v-card>
@@ -320,12 +413,23 @@ import router from '../router'
       this.$http.get(`/api/board/list/${"006001"}`).then(res =>{
           this.notice=res.data;
         })
+        //질문하기 불러오기
+        this.$http.get(`/api/board/list/${"006003"}`).then(res =>{
+          this.notice2=res.data;
+        })
       
     },
 
     data () {
       return {
         dialog: false,
+        dlRead: false,
+        expanded: [],
+        singleExpand: false,
+        rd: {
+        title: '',
+        content: ''
+      },
         step_value: 1,
         tabs: null,
         selected: [],
@@ -338,17 +442,22 @@ import router from '../router'
         search: '',
         courseTabs: ["공지사항", "받아쓰기등록","학습현황","신청현황","QnA"],
         headers: [
-          { text: '제목', value: 'title' },
-          { text: '내용', value: 'content' },
+          { text: '제목', value: 'title', sortable: false, align:'left'},
           { text: '작성자', value: 'input_id' },
           { text: '파일', value: 'file_nm'},
           { text: 'Actions', value: 'actions', sortable: false },
         ],
-        editedItem: {
+        editedItem001: {
           title: '',
           content: '',
           file:null,
           board_cd:'001',
+        },
+        editedItem003: {
+          title: '',
+          content: '',
+          file:null,
+          board_cd:'003',
         },
         defaultItem: {
           title: '',
@@ -356,7 +465,12 @@ import router from '../router'
           file_nm:null,
           board_cd:'001',
         },
-        notice: [],
+        notice: [
+
+        ],
+        notice2:[
+
+        ],
         editedIndex: -1,
         headers2: [
           {text:'No', value:'board_cd'},
@@ -397,6 +511,11 @@ import router from '../router'
           { text: '연락처', value: 'cel_phone_no' },
           { text: '가입일', value: 'register_dt' },
         ],
+        headers5: [
+          { text: '제목', value: 'title' },
+          { text: '작성자', value: 'input_id' },
+          { text: '파일', value: 'file_nm'},
+        ],
         lecture2: [
         ],
         lecture3:[
@@ -433,43 +552,85 @@ import router from '../router'
       this.initialize()
     },
     methods: {
+      //공지사항 읽기 테스트
+      //read () {
+      //this.rd.title = atc.title
+      //this.loading = true
+      //this.$http.get(`/api/board/list/${this.no}/${this.seq_no}`)
+    //
       initialize () {
         this.notice = [
         ]
       },
+      //공지사항 수정
       editItem (item) {
         this.editedIndex = this.notice.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+        this.editedItem001 = Object.assign({}, item)
         this.dialog = true
       },
+      // 공지사항 삭제
       deleteItem (item) {
         const index = this.notice.indexOf(item)
         confirm('정말로 삭제하시겠습니까?') && this.notice.splice(index, 1)
+        this.$http.get(`/api/board/delete/${item.board_cd}/${item.no}/${item.seq_no}`).then(res =>{
+          console.log(res);
+          router.push({name: 'tmain'});
+        })
       },
       close () {
         this.dialog = false
         this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedItem001 = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
       },
-      //게시판 저장
-      save () {
-        const formData = new FormData();
-        formData.append("board_cd",this.editedItem.board_cd);
-        formData.append("content",this.editedItem.content);
-        formData.append("title",this.editedItem.title);
-        if(this.editedItem.file==null){//파일없음
-          this.$http.post('/api/board/insert_nofile', formData).then(res =>{
-            console.log(res);
-          })
-        }else{//파일있음
-          formData.append("file",this.editedItem.file);
-            this.$http.post('/api/board', formData).then(res =>{
-            console.log(res);
-          })
+      //공지사항 저장
+      save (item) {
+    
+        if (this.editedIndex > -1) { //게시판 글수정 update
+          Object.assign(this.notice[this.editedIndex], item)
+          //board_cd, no, seq_no, title, content
+          const formData = new FormData();
+          formData.append("board_cd",this.editedItem001.board_cd);
+          formData.append("no",this.editedItem001.no);
+          formData.append("seq_no",this.editedItem001.seq_no);
+          formData.append("content",this.editedItem001.content);
+          formData.append("title",this.editedItem001.title);
+
+          if(this.editedItem001.file==null){//파일없음
+            this.$http.post('/api/board/update_nofile',formData).then(res =>{
+              console.log(res);
+              router.push({name: 'tmain'});
+            })    
+          }else{//파일있음
+            formData.append("file",this.editedItem001.file);
+            this.$http.post('/api/board/update',formData).then(res =>{
+              console.log(res);
+              router.push({name: 'tmain'});
+            })    
+          }
+        
+        } else { //게시판 글등록 insert
+          this.notice.push(item)
+
+          const formData = new FormData();
+          formData.append("board_cd",item.board_cd);
+          formData.append("content",item.content);
+          formData.append("title",item.title);
+          if(item.file==null){//파일없음
+            this.$http.post('/api/board/insert_nofile', formData).then(res =>{
+              console.log(res);
+            })
+          }else{//파일있음
+            formData.append("file",item.file);
+              this.$http.post('/api/board', formData).then(res =>{
+              console.log(res);
+            })
+          }
         }
+        
         this.close()
+        location.reload(true);
       },
       //받아쓰기 단계가 바뀌면 해당단계를 lecture2에 적용(등록일때)
       isdictation(value){
@@ -514,7 +675,7 @@ import router from '../router'
         
     },
 
-    //수정버튼
+    //받아쓰기 수정버튼
     modify() {
         //alert('오는가?');
         for(let item of this.lecture2) {
@@ -549,14 +710,14 @@ import router from '../router'
     },
 
     //게시판에 파일 업로드
-    boardFile1(file){
-      this.editedItem.file=file;
+    boardFile1(file, item){
+      item.file=file;
     },
-    //등록
+    //받아쓰기 등록
     processFile1(file, item) {
       item.file = file;
     },
-    //수정
+    //받아쓰기 수정
     processFile2(file, item) {
       item.file_nm = file;
       item.change_file=true;
