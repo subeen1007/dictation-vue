@@ -79,19 +79,15 @@
     </v-flex>
           <!-- 회원관리-->
           <v-data-table
+          v-model="selected"
           :headers="headers"
           :items="lectures"
           :search="search2"
+          :single-select="singleSelect"
+          item-key="user_id"
+          show-select
+          class="elevation-1"
           >
-    <template v-slot:item="row">
-        <tr>
-          <td><input type="checkbox" id="choice"></td>
-          <td><input type="text" id="lecture" v-model="row.item.lecture_nm"></td>
-          <td><input type="text" id="grade" v-model="row.item.grade"></td>
-          <td><input type="text" id="teacher" v-model="row.item.teacher_nm"></td>
-          <td><input type="text" id="enroll" v-model="row.item.enroll_ed_dt"></td>
-        </tr>
-    </template>
     </v-data-table>
         </v-card>
       </v-tab-item>
@@ -113,21 +109,15 @@
     <v-btn small color="primary" dark class="ml-5" @click="yearsave()">저장</v-btn>
      </v-flex>
     <v-data-table
+      v-model="selected"
       :headers="headers2"
       :items="rows"
       :search="search2"
+      :single-select="singleSelect"
+      item-key="user_id"
+      show-select
+      class="elevation-1"
     >
-    <template v-slot:item="">
-        <tr v-for="row in rows" v-bind:key="row">
-          <td><input type="checkbox" id="choice"></td>
-          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
-          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
-          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
-          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
-          <td><input type="checkbox" id="study_use"></td>
-          <td><a @click="removeRow(row)">Remove</a></td>
-        </tr>
-    </template>
     </v-data-table>
     </v-card>
     </v-tab-item>
@@ -141,47 +131,34 @@
      <v-card class="mx-auto">
       <v-spacer></v-spacer>
        <v-data-table
+        v-model="selected"
         :headers="headers3"
         :items="rows2"
+        :single-select="singleSelect"
+        item-key="user_id"
+        show-select
+        class="elevation-1"
        >
-       <template v-slot:item="">
-        <tr v-for="row in rows" v-bind:key="row">
-          <td><input type="checkbox" id="choice"></td>
-          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
-          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
-          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
-          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
-          <td><input type="checkbox" id="study_use"></td>
-          <td><a @click="removeRow(row)">Remove</a></td>
-        </tr>
-    </template>
        </v-data-table>
      </v-card>
     </v-tab-item>
          <v-tab-item>
            <!-- 소코드-->
            <v-flex class="text-right">
-             <button class="button btn-primary" @click="addRow3">추가하기</button>
     <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">삭제</v-btn>
     <v-btn small color="primary" dark class="ml-5" @click="socodesave()">저장</v-btn>
      </v-flex>
      <v-card class="mx-auto">
       <v-spacer></v-spacer>
        <v-data-table
+        v-model="selected"
         :headers="headers4"
         :items="rows3"
+        :single-select="singleSelect"
+        item-key="user_id"
+        show-select
+        class="elevation-1"        
        ></v-data-table>
-       <template v-slot:item="">
-        <tr v-for="row in rows" v-bind:key="row">
-          <td><input type="checkbox" id="choice"></td>
-          <td><input type="text" class="lecture" id="lecture" v-model="row.lecture"></td>
-          <td><input type="text" class="lecture" id="grade" v-model="row.grade"></td>
-          <td><input type="text" class="lecture" id="teacher" v-model="row.teacher"></td>
-          <td><input type="text" class="lecture" id="enroll" v-model="row.enroll"></td>
-          <td><input type="checkbox" id="study_use"></td>
-          <td><a @click="removeRow(row)">Remove</a></td>
-        </tr>
-    </template>
      </v-card>
     </v-tab-item>
     </v-tabs-items>
@@ -203,20 +180,18 @@ import router from '../router'
         search: '',
         courseTabs: ["회원관리", "년도/학기", "대코드", "소코드"],
         headers: [
-          { text: '선택', value: 'checkbox'},
           { text: '승인구분', value: 'grade' },
-          { text: '신분', value: 'teacher_nm' },
-          { text: '아이디', value: 'enroll_ed_dt' },
-          { text: '이름', value: 'actions', sortable: false },
-          { text: '성별', value: 'enroll_ed_dt' },
-          { text: '생년월일', value: 'enroll_ed_dt' },
-          { text: '학년', value: 'enroll_ed_dt' },
-          { text: '반', value: 'enroll_ed_dt' },
-          { text: '연락처', value: 'enroll_ed_dt' },
-          { text: '가입일', value: 'enroll_ed_dt' },
+          { text: '신분', value: 'position_cd' },
+          { text: '아이디', value: 'user_id' },
+          { text: '이름', value: 'kor_nm', sortable: false },
+          { text: '성별', value: 'gender_cd' },
+          { text: '생년월일', value: 'birth_dt' },
+          { text: '학년', value: 'grade' },
+          { text: '반', value: 'ban' },
+          { text: '연락처', value: 'cel_phone_no' },
+          { text: '가입일', value: 'register_dt' },
         ],
         headers2: [
-          { text: '선택', value: 'lecture_nm' },
           { text: '년도', value: 'grade' },
           { text: '학기', value: 'teacher_nm' },
           { text: '관리시작일', value: 'enroll_ed_dt' },
@@ -224,13 +199,11 @@ import router from '../router'
           { text: '사용여부', value: 'enroll_ed_dt' },
         ],
         headers3: [
-          {text: '선택', value: 'checkbox'},
           {text: '대코드', value: 'daecode'},
           {text: '대코드명', value: 'daecodename'},
           {text: '비고', value: 'note'},
         ],
         headers4: [
-          {text: '선택', value: 'checkbox'},
           {text: '소코드', value: 'socode'},
           {text: '소코드명', value: 'socodename'},
           {text: '비고', value: 'name'},
@@ -238,10 +211,7 @@ import router from '../router'
         lectures:[
           
         ],
-        rows:[],
-        rows2:[],
-        rows3:[],
-        rows4:[],
+        selected: [],
       }
     },
     created(){
@@ -274,39 +244,6 @@ import router from '../router'
       gotmain(){
         router.push({name: 'Home'});
       },
-      //row바 회원관리 추가
-      addRow4: function(){
-      this.rows4.push({name:"",job:""});
-      alert('aa');
-      console.log(this.rows)
-      },
-      //row바 년도/학기 추가 
-      addRow: function(){
-      this.rows.push({name:"",job:""});
-      alert('aa');
-      console.log(this.rows)
-      },
-      //row바 대코드 추가
-      addRow2: function(){
-        this.rows2.push({name:'',job:''})
-        alert('b');
-        console.log(this.rows2)
-      },
-      //row바 소코드 추가
-      addRow3: function(){
-        this.rows3.push({name:'',job:''})
-        alert('c');
-        console.log(this.rows3)
-      },
-      //row바 회원관리 삭제
-      removeRow: function(row){
-        alert('bb');
-        //console.log(row);
-        this.rows.$remove(row);
-      },
-      //row바 년도/학기 삭제
-      //row바 대코드 삭제
-      //row바 소코드 삭제
       //엑셀 업로드테스트 엑셀 결과를 lectures으로 보냄 https://godd.tistory.com/41
       importExcel(event) {
       const file = event.target.files[0];

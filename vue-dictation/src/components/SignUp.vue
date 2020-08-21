@@ -72,8 +72,8 @@
             </v-date-picker>
             </v-dialog>
             <v-radio-group v-model="gender_cd" row>
-              <v-radio label="남자" value="G01"></v-radio>
-              <v-radio label="여자" value="G02"></v-radio>
+              <v-radio label="남자" value="002001"></v-radio>
+              <v-radio label="여자" value="002002"></v-radio>
             </v-radio-group>
             <v-text-field
               v-model="cel_phone_no"

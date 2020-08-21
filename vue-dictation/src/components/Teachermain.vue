@@ -265,7 +265,39 @@
             ></v-text-field>
             <br>
         <v-flex class="text-right">
-        <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">엑셀업로드</v-btn>
+          <!-- 엑셀업로드 -->
+          <template>
+            <v-dialog v-model="excel_dialog" max-width="500px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      width="100"
+                      x-medium
+                      color="#FSFSFS"
+                      class="mb-2"
+                      v-bind="attrs"
+                      v-on="on"
+                    >엑셀업로드</v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
+
+                    <v-card-text>  
+                      <v-file-input @change="excelFile1($event)" label="업로드"></v-file-input>                                  
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue darken-1" text @click="close">취소</v-btn>
+                      <v-btn color="blue darken-1" text @click="excel_save(excel_file)">저장</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+          
+          </template>
+          <!-- 엑셀업로드 끝 -->
+        <!-- <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">엑셀업로드</v-btn> -->
         <v-btn width="100" color="primary" x-medium @click="removeRow(row)">추가</v-btn>
         <v-btn width="100" color="primary" x-medium @click="removeRow(row)">삭제</v-btn>
         <v-btn width="100" color="primary" x-medium @click="submit()">저장</v-btn>
@@ -422,6 +454,7 @@ import router from '../router'
 
     data () {
       return {
+        excel_dialog: false,
         dialog: false,
         dlRead: false,
         expanded: [],
@@ -535,7 +568,7 @@ import router from '../router'
       el: '#choice',
       max_dic_course:0,
       submit_yn:1,//등록가능 여부(가능1, 불가능0)
-      //files:[],
+      excel_file:null,//엑셀업로드 파일
       }
   },
   computed: {
@@ -578,11 +611,34 @@ import router from '../router'
         })
       },
       close () {
+        this.excel_file=null
         this.dialog = false
+        this.excel_dialog=false
         this.$nextTick(() => {
           this.editedItem001 = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
+      },
+
+
+      //엑셀업로드 저장
+      excel_save(item){
+        if(item==null){
+          alert("엑셀 파일을 업로드 해주세요");
+        }else{
+          const formData = new FormData();
+          formData.append("file",item);
+          this.$http.post('/api/teacher/excelup',formData).then(res =>{
+              console.log(res);
+              this.close()
+              if(res.data==0){
+                alert("엑셀 파일 업로드 완료");
+              }else if(res.data==1){
+                alert("엑셀 파일 업로드를 실패했습니다");
+              }
+
+            }) 
+        }
       },
       //공지사항 저장
       save (item) {
@@ -708,7 +764,9 @@ import router from '../router'
         
       }
     },
-
+    excelFile1(file){
+      this.excel_file=file;
+    },
     //게시판에 파일 업로드
     boardFile1(file, item){
       item.file=file;
