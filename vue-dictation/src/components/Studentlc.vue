@@ -501,6 +501,9 @@
         answer.course_no=this.step_value;
         answer.question = "";
       }
+      if(this.step_value > this.pass_course_no+1){
+        alert("제출할 수 없는 단계입니다.");
+      }
     },
     plus_step(){
       
@@ -508,6 +511,9 @@
       for(let answer of this.answers){
         answer.course_no=this.step_value;
         answer.question = "";
+      }
+      if(this.step_value > this.pass_course_no+1){
+        alert("제출할 수 없는 단계입니다.");
       }
     }
   }

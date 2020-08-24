@@ -55,16 +55,19 @@ const routes = [
     name: 'tmain',
     component: () => import('../components/Teachermain.vue')
   },{
+    path: '/OtherTeacher',
+    name: 'othert',
+    component: () => import('../components/OtherTeacher.vue')
+  },{
     path: '/Admin',
     name: 'admin',
     component: () => import('../components/Admin.vue')
   },{
-    path: '/Test',
-    name: 'test',
-    component: () => import('../components/Test.vue')
-
-
-  },{
+    path: '/Mypage',
+    name: 'mypage',
+    component: () => import('../components/Mypage.vue')
+  },
+  {
     path: '/crud',
     name: 'crud',
     component: () => import('../components/Crud.vue')
