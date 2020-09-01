@@ -129,7 +129,7 @@ import router from '../router'
     
     data(){
       return{
-        courseTabs: ["강좌등록", "받아쓰기 등록"],
+        courseTabs: ["강좌등록"],
         tabs: null,
         text:"",
         //데이터를 넣기위해선 함수형태여야함(data:()=>({})형태)

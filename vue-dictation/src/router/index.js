@@ -30,22 +30,9 @@ const routes = [
     component: () => import('../components/Viewlc.vue')
   },
   {
-    path: '/readlc',
-    name: 'readlc',
-    component: () => import('../components/Readlc.vue')
-  },
-  {
     path: '/studentlc',
     name: 'studentlc',
     component: () => import('../components/Studentlc.vue')
-  },{
-    path: '/write',
-    name: 'write',
-    component: () => import('../components/Teacher.vue')
-  },{
-    path: '/s_write',
-    name: 'sWrite',
-    component: () => import('../components/Student.vue')
   },{
     path: '/StudyWrite',
     name: 'stwr',
@@ -75,6 +62,10 @@ const routes = [
     path: '/crud2',
     name: 'crud2',
     component: () => import('../components/Crud2.vue')
+  },{
+    path: '/test',
+    name: 'test',
+    component: () => import('../components/Test.vue')
   }
   
 

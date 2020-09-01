@@ -50,7 +50,8 @@
       :headers="headers"
       :items="notice"
       :loading="loading"
-      sort-by="title"
+      sort-by="seq_no"
+      sort-desc="false"
       :single-expand="singleExpand"
       :expanded.sync="expanded"
       class="elevation-1"
@@ -64,7 +65,7 @@
           </v-toolbar>
         </template>
         <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length">{{ item.content }}</td>
+            <td :colspan="headers.length">제목: {{ item.title }}<br><br>내용: {{ item.content }}</td>
         </template>
     </v-data-table>
     </v-card>
@@ -75,8 +76,13 @@
             :headers="headers3"
             :items="notice2"
             :loading="loading"
-            sort-by="title"
+            sort-by="seq_no"
+            sort-desc="false"
             class="elevation-1"
+            :single-expand="singleExpand"
+            :expanded.sync="expanded1"
+            item-key="title"
+            show-expand
           >
           <template v-slot:top>
       <v-toolbar flat color="white">
@@ -87,7 +93,7 @@
           vertical
         ></v-divider>
         <v-spacer></v-spacer>
-        <v-dialog v-model="dialog" max-width="500px">
+        <v-dialog v-model="dialog_qna" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               color="primary"
@@ -103,19 +109,26 @@
             </v-card-title>
 
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.title" label="제목"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem.content" label="내용"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                      <v-file-input @change="boardFile1($event)" label="업로드"></v-file-input>
-                  </v-col>
-                </v-row>
-              </v-container>
+              <v-form>
+                <v-file-input v-model="editedItem.file" @change="boardFile1($event)" label="업로드"></v-file-input>
+                <v-divider></v-divider>
+                <v-text-field
+                  v-model="editedItem.title"
+                  label="제목"
+                  single-line
+                  full-width
+                  hide-details
+                ></v-text-field>
+                <v-divider></v-divider>
+                <v-textarea
+                  v-model="editedItem.content"
+                  label="내용"
+                  counter
+                  maxlength="2000"
+                  full-width
+                  single-line
+                ></v-textarea>
+              </v-form>
             </v-card-text>
 
             <v-card-actions>
@@ -141,17 +154,23 @@
     </v-dialog>
       </v-toolbar>
     </template>
+      <!-- 질문게시판 내용보기 -->
+        <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length">제목: {{ item.title }}<br><br>내용: {{ item.content }}</td>
+        </template>
     <template v-slot:item.actions="{ item }">
       <v-icon
         small
         class="mr-2"
         @click="editItem(item)"
+        v-if="user_id===item.input_id"
       >
         mdi-pencil
       </v-icon>
       <v-icon
         small
         @click="deleteItem(item)"
+        v-if="user_id===item.input_id"
       >
         mdi-delete
       </v-icon>
@@ -237,10 +256,13 @@
   export default {
     data () {
       return {
+        user_id:null, //학생아이디
+        panel: [],//게시판 내용을 보기위해 연 판넬
         notice:[],
         notice2:[],
         expanded: [],
-        singleExpand: false,
+        expanded1: [],
+        singleExpand: true,
         finish_yes_cl:[],//강좌에 대해 받아쓰기 완료처리된 단계들만 반환
         lecture_info:[],//강좌정보
         step_value: 1,
@@ -261,9 +283,8 @@
             value: 'lecture_nm',
           },
           { text: '학년', value: 'grade' },
-          { text: '선생님', value: 'teach_id' },
-          { text: '강좌기간', value: 'enroll_en_dt' },
-          { text: '내 점수', value: 'lecture_level' },
+          { text: '선생님', value: 'teacher_nm' },
+          { text: '강좌기간', value: 'enroll_ed_dt' },
         ],
         headers3: [
           { text: '제목', value: 'title' },
@@ -272,15 +293,10 @@
           { text: 'Actions', value: 'actions', sortable: false },
         ],
         lecture1: [
-          {
-            lecture_nm: '2반 받아쓰기',
-            grade: 1,
-            teach_id: '사오정',
-            enroll_en_dt: '5.16-6.26',
-            lecture_level: '70점',
-          },   
+          
         ],
         dialog: false,
+        dialog_qna: false,//질문게시판 등록하기
         editedIndex: -1,
         editedItem: {
           title: '',
@@ -291,7 +307,7 @@
         defaultItem: {
           title: '',
           content: '',
-          file_nm:null,
+          file:null,
           board_cd:'003',
         },
         score: 0,
@@ -311,6 +327,18 @@
     },
     // 음성파일 들고오기 예시
     created(){
+      //학생 아이디 반환
+      this.$http.get('/api/student/user/user_id').then(res =>{
+            this.user_id=res.data;
+      })
+      
+      //학생이 신청한 강좌
+      this.$http.post('/api/student/lecture/student_mylec').then(res =>{
+          //console.log('status code: ${res.ban}');
+          this.lecture1=res.data;
+          //console.log(res);
+          //alert(JSON.stringify(this.lectures));
+      })
       this.$http.get('/api/common/lecture/list').then(res =>{
             console.log('status code: ${res.ban}');
             this.lectures=res.data;
@@ -361,7 +389,7 @@
     },
       computed: {
         formTitle () {
-          return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+          return this.editedIndex === -1 ? '등록하기' : '수정하기'
         },
       },
       watch: {
@@ -378,53 +406,68 @@
         this.notice = [
         ]
       },
-      //공지사항 수정
+      //질문하기 수정
       editItem (item) {
-        this.editedIndex = this.notice.indexOf(item)
+        this.editedIndex = this.notice2.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialog = true
-        this.$http.get(`/api/board/update`).then(res =>{
-          console.log(res);
-          router.push({name: 'tmain'});
-        })
+        this.dialog_qna = true
       },
-      // 공지사항 삭제
+      // qna 삭제
       deleteItem (item) {
-        const index = this.notice.indexOf(item)
-        confirm('정말로 삭제하시겠습니까?') && this.notice.splice(index, 1)
-        this.$http.get(`/api/board/delete/${item.no}/${item.seq_no}`).then(res =>{
+        const index = this.notice2.indexOf(item)
+        confirm('정말로 삭제하시겠습니까?') && this.notice2.splice(index, 1)
+        this.$http.get(`/api/board/delete/${'006003'}/${item.no}/${item.seq_no}`).then(res =>{
           console.log(res);
-          router.push({name: 'tmain'});
+          router.push({name: 'studentlc'});
         })
       },
       close () {
-        this.dialog = false
+        this.dialog_qna = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
       },
-      //공지사항 저장
+      //qna 저장
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.notice[this.editedIndex], this.editedItem)
-        } else {
-          this.notice.push(this.editedItem)
+        if (this.editedIndex > -1) { //qna수정
+            //Object.assign(this.notice2[this.editedIndex], this.editedItem)
+            const formData = new FormData();
+            formData.append("board_cd",this.editedItem.board_cd);
+            formData.append("no",this.editedItem.no);
+            formData.append("seq_no",this.editedItem.seq_no);
+            formData.append("content",this.editedItem.content);
+            formData.append("title",this.editedItem.title);
+
+            if(this.editedItem.file==null){//파일수정 안함
+              this.$http.post('/api/board/update_nofile',formData).then(res =>{
+                console.log(res);
+              }) 
+            }else{//파일수정 했을때
+              formData.append("file",this.editedItem.file);
+              this.$http.post('/api/board/update',formData).then(res =>{
+                console.log(res);
+              })  
+            }
+        } else { //qna 등록
+          this.notice2.push(this.editedItem)
+
+          const formData = new FormData();
+          formData.append("board_cd",this.editedItem.board_cd);
+          formData.append("content",this.editedItem.content);
+          formData.append("title",this.editedItem.title);
+          if(this.editedItem.file==null){//파일없음
+            this.$http.post('/api/board/insert_nofile', formData).then(res =>{
+              console.log(res);
+            })
+          }else{//파일있음
+            formData.append("file",this.editedItem.file);
+              this.$http.post('/api/board', formData).then(res =>{
+              console.log(res);
+            })
+          }
         }
-        const formData = new FormData();
-        formData.append("board_cd",this.editedItem.board_cd);
-        formData.append("content",this.editedItem.content);
-        formData.append("title",this.editedItem.title);
-        if(this.editedItem.file==null){//파일없음
-          this.$http.post('/api/board/insert_nofile', formData).then(res =>{
-            console.log(res);
-          })
-        }else{//파일있음
-          formData.append("file",this.editedItem.file);
-            this.$http.post('/api/board', formData).then(res =>{
-            console.log(res);
-          })
-        }
+        
         this.close()
       },
       boardFile1(file){

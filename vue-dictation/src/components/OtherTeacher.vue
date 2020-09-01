@@ -201,13 +201,14 @@
       })
 
 
-      //받아쓰기 음성파일 url주소 반환
+      //받아쓰기 question, fileUrl정보 반환
       for(let answer of this.answers){
         const formData=new FormData();
         formData.append("course_no",answer.course_no);
         formData.append("question_no",answer.question_no);
-        this.$http.post('/api/dictation/course/audio',formData).then(res =>{
-              answer.fileUrl=res.data;
+        this.$http.post('/api/dictation/course/get',formData).then(res =>{
+              answer.fileUrl=res.data.fileUrl;
+              answer.question=res.data.question;
               console.log(res.data);
         })
       }
@@ -239,7 +240,14 @@
       this.step_value = (this.step_value - 1) || 1
       for(let answer of this.answers){
         answer.course_no=this.step_value;
-        answer.question = "";
+        const formData=new FormData();
+        formData.append("course_no",answer.course_no);
+        formData.append("question_no",answer.question_no);
+        this.$http.post('/api/dictation/course/get',formData).then(res =>{
+              answer.fileUrl=res.data.fileUrl;
+              answer.question=res.data.question;
+              console.log(res.data);
+        })
       }
     },
     plus_step(){
@@ -247,7 +255,14 @@
       this.step_value = (this.step_value + 1) || 40
       for(let answer of this.answers){
         answer.course_no=this.step_value;
-        answer.question = "";
+        const formData=new FormData();
+        formData.append("course_no",answer.course_no);
+        formData.append("question_no",answer.question_no);
+        this.$http.post('/api/dictation/course/get',formData).then(res =>{
+              answer.fileUrl=res.data.fileUrl;
+              answer.question=res.data.question;
+              console.log(res.data);
+        })
       }
     }
   }

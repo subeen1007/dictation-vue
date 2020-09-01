@@ -5,6 +5,13 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import vuetify from './plugins/vuetify';
+import VueSession from 'vue-session'
+
+var sessionOptions = {
+  persist: true
+}
+Vue.use(VueSession, sessionOptions)
+
 Vue.config.productionTip = false
 // 컴포넌트에서 axios를 import 하지 않고 바로 쓰기 위한 전역 설정.
 Vue.prototype.$http = axios
@@ -16,3 +23,5 @@ new Vue({
   vuetify,
   render: h => h(App)
 }).$mount('#app')
+
+

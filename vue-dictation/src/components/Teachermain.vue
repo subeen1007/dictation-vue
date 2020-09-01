@@ -51,12 +51,15 @@
             :headers="headers"
             :items="notice"
             :loading="loading"
-            sort-by="title"
+            sort-by="seq_no" 
+            sort-desc="false" 
+            :single-expand="singleExpand"
+            :expanded.sync="expanded1"
             class="elevation-1"
+            item-key="seq_no"
+            show-expand
           >
-         <template slot="items" slot-scope="props">
-            <td :class="headers[0].class"><a small flat class="text-capitalize" left @click="read(props.item)"> {{ props.item.title }}</a></td>
-        </template>
+         
           <template v-slot:top>
       <v-toolbar flat color="white">
         <v-toolbar-title>공지 사항</v-toolbar-title>
@@ -82,19 +85,27 @@
             </v-card-title>
 
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem001.title" label="제목"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem001.content" label="내용"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                      <v-file-input @change="boardFile1($event, editedItem001)" label="업로드"></v-file-input>
-                  </v-col>
-                </v-row>
-              </v-container>
+              <v-form>
+                <v-file-input v-model="editedItem001.file" @change="boardFile1($event, editedItem001)" label="업로드"></v-file-input>
+                <v-divider></v-divider>
+                <v-text-field
+                  v-model="editedItem001.title"
+                  label="제목"
+                  single-line
+                  full-width
+                  hide-details
+                ></v-text-field>
+                <v-divider></v-divider>
+                <v-textarea
+                  v-model="editedItem001.content"
+                  label="내용"
+                  counter
+                  maxlength="2000"
+                  full-width
+                  single-line
+                ></v-textarea>
+              </v-form>
+
             </v-card-text>
 
             <v-card-actions>
@@ -120,6 +131,10 @@
     </v-dialog>
       </v-toolbar>
     </template>
+    <!--공지사항 내용-->
+      <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length">제목: {{ item.title }}<br><br>내용: {{ item.content }}</td>
+      </template>
     <template v-slot:item.actions="{ item }">
       <v-icon
         small
@@ -280,7 +295,7 @@
                   </template>
                   <v-card>
                     <v-card-title>
-                      <span class="headline">{{ formTitle }}</span>
+                      <span class="headline">엑셀업로드</span>
                     </v-card-title>
 
                     <v-card-text>  
@@ -298,9 +313,9 @@
           </template>
           <!-- 엑셀업로드 끝 -->
         <!-- <v-btn width="100" color="#FSFSFS" x-medium @click="submit()">엑셀업로드</v-btn> -->
-        <v-btn width="100" color="primary" x-medium @click="removeRow(row)">추가</v-btn>
-        <v-btn width="100" color="primary" x-medium @click="removeRow(row)">삭제</v-btn>
-        <v-btn width="100" color="primary" x-medium @click="submit()">저장</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="addRow()">추가</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="removeRow()">삭제</v-btn>
+        <v-btn width="100" color="primary" x-medium @click="save_request()">저장</v-btn>
         <v-btn width="100" color="#FSFSFS" x-medium @click="success()">승인</v-btn>
     </v-flex>
      <v-card class="mx-auto">
@@ -324,7 +339,8 @@
             :headers="headers5"
             :items="notice2"
             :loading="loading"
-            sort-by="title"
+            sort-by="seq_no"
+            sort-desc="false"
             :single-expand="singleExpand"
             :expanded.sync="expanded"
             class="elevation-1"
@@ -335,7 +351,8 @@
           <template v-slot:top>
         </template>
         <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length">{{ item.content }}</td>
+            <td :colspan="headers.length">제목: {{ item.title }}<br><br>내용: {{ item.content }}</td>
+          
         </template>
           <template v-slot:top>
       <v-toolbar flat color="white">
@@ -346,7 +363,7 @@
           vertical
         ></v-divider>
         <v-spacer></v-spacer>
-        <v-dialog v-model="dialog" max-width="500px">
+        <v-dialog v-model="dialog_qna" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               color="primary"
@@ -362,24 +379,31 @@
             </v-card-title>
 
             <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem003.title" label="제목"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field v-model="editedItem003.content" label="내용"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                      <v-file-input @change="boardFile1($event, editedItem003)" label="업로드"></v-file-input>
-                  </v-col>
-                </v-row>
-              </v-container>
+              <v-form>
+                <v-file-input v-model="editedItem003.file" @change="boardFile1($event, editedItem003)" label="업로드"></v-file-input>
+                <v-divider></v-divider>
+                <v-text-field
+                  v-model="editedItem003.title"
+                  label="제목"
+                  single-line
+                  full-width
+                  hide-details
+                ></v-text-field>
+                <v-divider></v-divider>
+                <v-textarea
+                  v-model="editedItem003.content"
+                  label="내용"
+                  counter
+                  maxlength="2000"
+                  full-width
+                  single-line
+                ></v-textarea>
+              </v-form>
             </v-card-text>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close">취소</v-btn>
+              <v-btn color="blue darken-1" text @click="close()">취소</v-btn>
               <v-btn color="blue darken-1" text @click="save(editedItem003)">저장</v-btn>
             </v-card-actions>
           </v-card>
@@ -425,6 +449,7 @@
 import router from '../router'
   export default {
     created(){
+      //신청현황 리스트
       this.$http.post('/api/teacher/enroll/list_request').then(res =>{
         //console.log('status code: ${res.ban}');
         this.lecture3=res.data;
@@ -455,10 +480,12 @@ import router from '../router'
     data () {
       return {
         excel_dialog: false,
+        dialog_qna: false,
         dialog: false,
         dlRead: false,
         expanded: [],
-        singleExpand: false,
+        expanded1: [],//공지사항 내용
+        singleExpand: true,
         rd: {
         title: '',
         content: ''
@@ -573,11 +600,14 @@ import router from '../router'
   },
   computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? '글 작성하기' : '글 수정하기'
       },
     },
     watch: {
       dialog (val) {
+        val || this.close()
+      },
+      dialog_qna (val) {
         val || this.close()
       },
     },
@@ -613,6 +643,7 @@ import router from '../router'
       close () {
         this.excel_file=null
         this.dialog = false
+        this.dialog_qna=false
         this.excel_dialog=false
         this.$nextTick(() => {
           this.editedItem001 = Object.assign({}, this.defaultItem)
@@ -754,7 +785,23 @@ import router from '../router'
           })
         }
     },
-    //승인버튼
+    //신청현황 추가버튼
+    addRow(){
+      
+    },
+    //신청현황 삭제버튼
+    removeRow(){
+      for(let item of this.selected){
+        this.lecture3.splice(this.lecture3.indexOf(item),1);
+      }
+    },
+    //신청현황 저장버튼
+    save_request(){
+      this.$http.post('/api/teacher/users/list_request_save',this.lecture3).then(res =>{
+        console.log(res);
+      })
+    },
+    //신청현황 승인버튼
     success(){
       for(let item of this.selected) {
         

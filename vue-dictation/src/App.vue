@@ -113,12 +113,12 @@ export default {
     drawer: null,
     items: [
   
-      {  text: '홈' ,path:'/home', isOpen: false},
-      { text: '개설강좌', path:'/viewlc',isOpen: false},
-      { text: '수강강좌', path:'/readlc',isOpen: false},
-      { text: '학생강좌화면', path:'/studentlc',isOpen:false},
-      { text: '받아쓰기등록', path:'/write',isOpen:false},
-      { text: '받아쓰기', path:'/s_write', isOpen:false},
+      {icon:'mdi-home',  text: '선생님 메인화면' ,path:'/home', isOpen: false},
+      {icon:'mdi-home',  text: '학생 메인화면', path:'/viewlc',isOpen: false},
+      //{ text: '수강강좌', path:'/readlc',isOpen: false},
+      //{ text: '학생강좌화면', path:'/studentlc',isOpen:false},
+      //{ text: '받아쓰기등록', path:'/write',isOpen:false},
+      {icon: 'mdi-account', text: '마이페이지', path:'/Mypage', isOpen:false},
       { icon: 'mdi-account-arrow-left', text: 'SignIn', path:'/',isOpen: false},
       { icon: 'mdi-account-plus', text: 'SignUp', path:'/sign-up', isOpen:false},
         // { icon: 'mdi-content-copy', text: 'Duplicates' },
@@ -150,27 +150,27 @@ export default {
   },
   watch:{
     isSignIn : function() {
-      this.items[6].isOpen = this.isSignIn,
-      this.items[7].isOpen = this.isSignIn
+      this.items[3].isOpen = this.isSignIn,
+      this.items[4].isOpen = this.isSignIn
     },
     SorT : function(data) {
-      if(data !== "학생"){
+      if(data !== "학생"){//선생님
       
-        this.items[4].isOpen = false;
         this.items[0].isOpen = true;
-
-        this.items[5].isOpen = false;
-        this.items[1].isOpen = false;
-        this.items[2].isOpen = false;
-        this.items[3].isOpen = false;
-      } else if(data === "학생") {
-         this.items[4].isOpen = false;
-        this.items[0].isOpen = false;
-
-        this.items[5].isOpen = false;
-        this.items[1].isOpen = true;
         this.items[2].isOpen = true;
-        this.items[3].isOpen = true;
+
+        this.items[1].isOpen = false;
+        this.items[3].isOpen = false;
+        this.items[4].isOpen = false;
+        //this.items[5].isOpen = false;
+      } else if(data === "학생") { //학생
+         this.items[1].isOpen = true;
+        this.items[2].isOpen = true;
+
+        this.items[0].isOpen = false;
+        this.items[3].isOpen = false;
+        this.items[4].isOpen = false;
+        //this.$session.set('position_cd',12345);
       }
     }
     
@@ -183,8 +183,8 @@ export default {
   // },
   updated(){
     if(this.isSignIn) {
-      this.items[6].isOpen = this.isSignIn,
-      this.items[7].isOpen = this.isSignIn
+      this.items[3].isOpen = this.isSignIn,
+      this.items[4].isOpen = this.isSignIn
     }
   },
   

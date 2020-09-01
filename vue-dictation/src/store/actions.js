@@ -9,6 +9,7 @@ const actions = {
       console.log(res)
     }).catch((err) => {
       console.log(err,commit); 
+      alert("아이디가 중복됐습니다.");
     })
   },
   //로그인
