@@ -40,9 +40,10 @@
       :headers="headers"
       :items="notice"
       :loading="loading"
-      sort-by="title"
+      sort-by="seq_no" 
+      sort-desc="false" 
       :single-expand="singleExpand"
-      :expanded.sync="expanded"
+      :expanded.sync="expanded1"
       class="elevation-1"
       item-key="seq_no"
       show-expand
@@ -65,8 +66,13 @@
             :headers="headers3"
             :items="notice2"
             :loading="loading"
-            sort-by="title"
+            sort-by="seq_no" 
+            sort-desc="false" 
+            :single-expand="singleExpand"
+            :expanded.sync="expanded"
             class="elevation-1"
+            item-key="seq_no"
+            show-expand
           >
           <template v-slot:top>
       <v-toolbar flat color="white">
@@ -80,6 +86,9 @@
         
       </v-toolbar>
     </template>
+    <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length">{{ item.content }}</td>
+        </template>
    
        </v-data-table>
     </v-tab-item>
@@ -148,8 +157,9 @@
       return {
         notice:[],
         notice2:[],
-        expanded: [],
-        singleExpand: false,
+        expanded: [],//qna내용
+        expanded1: [],//공지사항 내용
+        singleExpand: true,
         finish_yes_cl:[],//강좌에 대해 받아쓰기 완료처리된 단계들만 반환
         lecture_info:[],//강좌정보
         step_value: 1,

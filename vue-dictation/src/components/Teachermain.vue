@@ -557,7 +557,7 @@ import router from '../router'
           { text: '반', value: 'ban' },
           { text: '진도율', value: 'pass_course_no' },
           { text: '연습시간', value: 'study_time' },
-          { text: '받아쓰기 점수', value: 'pass_course_no' },
+          { text: '통과단계', value: 'pass_course_no' },
         ],
         headers4: [
           { text: '선택', value: 'checkbox'},

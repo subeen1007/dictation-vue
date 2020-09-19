@@ -23,10 +23,13 @@
               type="password"
               label="패스워드를 입력하세요."
             ></v-text-field>
-            <v-btn large block depressed color="primary" @click="signIn({
-              user_id: user_id,
-              pw: pw
-            })">로그인</v-btn>
+            
+              <v-btn large width="190" color="primary" @click="signIn({
+                user_id: user_id,
+                pw: pw
+              })">로그인</v-btn>
+              <v-btn large width="190" color="primary" @click="gosignUp()">회원가입</v-btn>
+            
           </div>
           
         </v-card>      
@@ -36,6 +39,7 @@
 </template>
 
 <script>
+import router from '../router';
 import {mapActions} from 'vuex';
 export default {
   name: 'SignIn',
@@ -48,6 +52,9 @@ export default {
     //   if(signIn===null)
     //   return null;
     // },
+    },
+    gosignUp(){
+      router.push({name: 'SignUp'});
     },
     ...mapActions(['signIn'])
   }

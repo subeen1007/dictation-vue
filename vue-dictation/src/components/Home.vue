@@ -81,7 +81,7 @@
     </v-card-title>
     <v-btn small color="primary" dark class="ml-5" @click="gonewstudy()">강좌개설하기</v-btn>
     <v-btn small color="primary" dark class="ml-6" @click="lecture_rd()">수정/삭제</v-btn>
-    <v-btn small color="primary" dark class="ml-6" @click="gomypage()">마이페이지</v-btn>
+    
     <!-- 개설 강좌-->
     <v-data-table
       :headers="headers2"
